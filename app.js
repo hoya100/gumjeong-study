@@ -214,7 +214,7 @@ function renderQuestion() {
   const reportUrl = state.config.reportUrl;
   const report = $("report-link");
   report.hidden = !reportUrl;
-  if (reportUrl) report.href = reportUrl + (reportUrl.includes("?") ? "&" : "?") + "q=" + q.id;
+  if (reportUrl) report.href = reportUrl.replace("{id}", encodeURIComponent(q.id));
 
   // 보기 섞기: 보기마다 "원래 몇 번이었는지"를 같이 들고 다녀야
   // 섞은 뒤에도 정답을 알아볼 수 있어요.
