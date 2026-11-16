@@ -84,16 +84,59 @@ button, a.primary, a.secondary {
 .section-title { font-size: 15px; font-weight: 700; margin: 28px 0 10px; }
 .section-title.muted { color: var(--muted); }
 
+/* 흰 카드: 여러 화면에서 같은 모양을 쓰니까 하나로 묶어요. */
+.card { background: var(--card); border-radius: var(--radius); padding: 18px 20px; }
+
 /* ---------- 홈 ---------- */
 .home-head { padding-top: 36px; }
 .home-head h1 { font-size: 26px; line-height: 1.35; margin: 8px 0 20px; }
 
-.dday-card {
-  background: var(--card);
-  border-radius: var(--radius);
-  padding: 18px 20px;
-  display: flex; justify-content: space-between; align-items: center;
+.dday-card { display: flex; justify-content: space-between; align-items: center; }
+
+.about-card { margin: 32px 0 40px; font-size: 14px; color: var(--sub); }
+.about-card p { margin: 0; }
+.about-title { font-weight: 700; color: var(--ink); margin-bottom: 6px !important; }
+.about-meta { margin-top: 10px !important; font-size: 13px; color: var(--muted); }
+.about-meta a { color: var(--sub); }
+
+/* ---------- 상단 줄 (과목·퀴즈 공통) ---------- */
+.top-row-wrap { position: sticky; top: 0; z-index: 2; background: var(--bg); padding: 12px 0; }
+.top-row { display: flex; align-items: center; gap: 12px; }
+.top-title { font-size: 20px; margin: 0; }
+
+/* ---------- 과목 화면 ---------- */
+.subject-body { padding-bottom: 120px; }
+
+.overview { display: grid; grid-template-columns: repeat(3, 1fr); text-align: center; padding: 16px 8px; }
+.overview-item + .overview-item { border-left: 1px solid var(--line); }
+.overview-label { margin: 0; font-size: 13px; color: var(--muted); }
+.overview-value { margin: 2px 0 0; font-size: 20px; font-weight: 700; font-variant-numeric: tabular-nums; }
+
+.weak-box { margin-top: 12px; font-size: 15px; color: var(--sub); }
+.weak-box strong { color: var(--ink); }
+.weak-box.has-weak { background: var(--bad-soft); }
+.weak-box.has-weak strong { color: var(--bad); }
+
+.unit-list { display: grid; gap: 10px; }
+.unit-card {
+  display: block; width: 100%; text-align: left;
+  background: var(--card); color: var(--ink);
+  border: 2px solid transparent; border-radius: var(--radius);
+  padding: 16px 20px;
 }
+@media (hover: hover) { .unit-card:hover { border-color: var(--accent); } }
+.unit-card.weak { border-color: var(--bad); }
+.unit-head { display: flex; justify-content: space-between; align-items: baseline; gap: 12px; }
+.unit-name { font-weight: 700; font-size: 16px; }
+.unit-rate { font-weight: 700; font-size: 15px; font-variant-numeric: tabular-nums; color: var(--sub); flex-shrink: 0; }
+.unit-range { margin: 2px 0 10px; font-size: 13px; color: var(--muted); }
+.unit-bar { height: 8px; background: var(--line); border-radius: 999px; overflow: hidden; }
+.unit-bar div { height: 100%; border-radius: 999px; background: var(--accent); }
+.unit-bar div.low { background: var(--bad); }
+.unit-bar div.mid { background: #f5a623; }
+.unit-bar div.high { background: var(--good); }
+.unit-foot { margin-top: 8px; font-size: 13px; color: var(--muted); display: flex; justify-content: space-between; }
+.unit-foot .go { color: var(--accent); font-weight: 700; }
 .dday-label { margin: 0; font-size: 13px; color: var(--muted); }
 .dday-value { margin: 2px 0 0; font-size: 22px; font-weight: 700; }
 .dday-value.empty { font-size: 16px; color: var(--sub); font-weight: 500; }
@@ -115,9 +158,10 @@ button, a.primary, a.secondary {
 }
 .subject-card .info strong { font-size: 18px; display: block; }
 .subject-card .info small { color: var(--muted); font-size: 13px; }
-.subject-card .actions { display: flex; gap: 8px; flex-shrink: 0; }
-.subject-card .actions .primary,
-.subject-card .actions .secondary { min-height: 44px; font-size: 14px; padding: 0 14px; }
+/* 카드 전체가 버튼이라 기본 버튼 모양을 지워요. */
+button.subject-card { width: 100%; border: 2px solid transparent; text-align: left; color: var(--ink); }
+@media (hover: hover) { button.subject-card:hover { border-color: var(--accent); } }
+.subject-card .go-btn { min-height: 44px; font-size: 14px; padding: 0 16px; flex-shrink: 0; }
 
 .soon-list { display: flex; flex-wrap: wrap; gap: 8px; }
 .soon-chip {
@@ -125,20 +169,11 @@ button, a.primary, a.secondary {
   border-radius: 999px; padding: 6px 14px; font-size: 14px;
 }
 
-.notice { margin: 32px 0 40px; font-size: 13px; color: var(--muted); }
-.notice a { color: var(--sub); }
-
 /* ---------- 퀴즈 ---------- */
-.quiz-top {
-  position: sticky; top: 0; z-index: 2;
-  background: var(--bg);
-  padding: 12px 0;
-}
-.quiz-top-row { display: flex; align-items: center; gap: 12px; }
 .icon-btn {
   width: 40px; height: 40px; flex-shrink: 0;
   border: none; border-radius: 12px; background: var(--card); color: var(--sub);
-  font-size: 16px;
+  font-size: 18px; line-height: 1;
 }
 .progress { flex: 1; height: 8px; background: var(--line); border-radius: 999px; overflow: hidden; }
 #progress-bar { height: 100%; width: 0; background: var(--accent); border-radius: 999px; transition: width 0.3s; }
@@ -172,13 +207,7 @@ button, a.primary, a.secondary {
 .choice.wrong .num { background: var(--bad); color: #fff; }
 .choice.dim { opacity: 0.5; }
 
-.feedback {
-  margin-top: 20px;
-  background: var(--card);
-  border-radius: var(--radius);
-  padding: 18px 20px;
-  animation: rise 0.2s ease-out;
-}
+.feedback { margin-top: 20px; animation: rise 0.2s ease-out; }
 .feedback-title { margin: 0 0 6px; font-weight: 700; font-size: 17px; }
 .feedback-title.good { color: var(--good); }
 .feedback-title.bad { color: var(--bad); }
@@ -210,9 +239,5 @@ button, a.primary, a.secondary {
 }
 .result-wrong li span { display: block; font-size: 13px; color: var(--good); margin-top: 2px; }
 
-.donate {
-  margin-top: 28px; padding: 20px;
-  border-radius: var(--radius); background: var(--card);
-  color: var(--sub); font-size: 14px;
-}
+.donate { margin-top: 28px; color: var(--sub); font-size: 14px; }
 .donate p { margin: 0 0 12px; }

@@ -5,7 +5,7 @@
   <!-- 휴대폰 화면 폭에 맞추라는 설정. 이게 없으면 폰에서 글씨가 아주 작게 보여요. -->
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>검정고시 기출유형 퀴즈</title>
-  <meta name="description" content="검정고시 한국사 기출 유형 무료 퀴즈. 틀린 문제는 오답노트에 자동 저장돼요.">
+  <meta name="description" content="검정고시 한국사 기출 유형 무료 퀴즈. 단원별로 풀고, 내 약점 단원을 확인하고, 틀린 문제는 오답노트로 다시 풀어요.">
   <!-- 한글 글꼴: 기기마다 기본 글꼴이 달라서, 어디서나 같은 느낌이 나도록 웹 글꼴을 불러와요. -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -13,11 +13,10 @@
   <link rel="stylesheet" href="style.css">
 </head>
 <body>
-  <!-- 화면은 3개(홈, 퀴즈, 결과)인데 페이지는 하나예요.
-       JS가 상황에 맞는 화면 하나만 보여주고 나머지는 숨겨요.
-       오답노트는 따로 화면을 만들지 않고, "틀린 문제만 푸는 퀴즈"로 재활용해요. -->
+  <!-- 화면은 4개(홈 → 과목 → 퀴즈 → 결과)이고 페이지는 하나예요.
+       JS가 상황에 맞는 화면 하나만 보여주고 나머지는 숨겨요. -->
 
-  <!-- ============ 1. 홈 ============ -->
+  <!-- ============ 1. 홈: 과목 고르기 ============ -->
   <section id="screen-home" class="screen">
     <div class="wrap">
       <header class="home-head">
@@ -26,7 +25,7 @@
       </header>
 
       <!-- D-day 카드: 수험생이 들어오자마자 가장 먼저 보고 싶은 정보라서 맨 위에 둬요. -->
-      <div class="dday-card">
+      <div class="card dday-card">
         <div>
           <p class="dday-label">시험까지</p>
           <p class="dday-value" id="dday">시험일을 설정하세요</p>
@@ -37,25 +36,68 @@
         </label>
       </div>
 
-      <!-- 바로 풀 수 있는 과목을 위에 크게, 준비 중인 과목은 아래에 작게 묶어요. -->
       <h2 class="section-title">풀 수 있는 과목</h2>
       <div id="ready-list" class="ready-list"></div>
 
       <h2 class="section-title muted">준비 중</h2>
       <div id="soon-list" class="soon-list"></div>
 
-      <p class="notice">
-        모든 문제는 기출 유형을 참고해 새로 만든 연습 문제예요.
-        <span id="official-link"></span>
-      </p>
+      <!-- 신뢰 카드: 처음 온 사람이 "믿어도 되나?"에 답을 얻는 곳 -->
+      <div class="card about-card">
+        <p class="about-title">이 사이트는요</p>
+        <p id="about-text"></p>
+        <p class="about-meta" id="about-meta"></p>
+        <p class="about-meta" id="official-link"></p>
+      </div>
     </div>
   </section>
 
-  <!-- ============ 2. 퀴즈 ============ -->
+  <!-- ============ 2. 과목: 단원 고르기 + 약점 지도 ============ -->
+  <section id="screen-subject" class="screen" hidden>
+    <div class="top-row-wrap">
+      <div class="wrap top-row">
+        <button id="subject-back-btn" class="icon-btn" aria-label="과목 선택으로">‹</button>
+        <h1 id="subject-title" class="top-title"></h1>
+      </div>
+    </div>
+
+    <div class="wrap subject-body">
+      <!-- 전체 진도: 지금까지 몇 문제를 풀었고 얼마나 맞혔는지 -->
+      <div class="card overview">
+        <div class="overview-item">
+          <p class="overview-label">푼 문제</p>
+          <p class="overview-value" id="ov-seen"></p>
+        </div>
+        <div class="overview-item">
+          <p class="overview-label">정답률</p>
+          <p class="overview-value" id="ov-rate"></p>
+        </div>
+        <div class="overview-item">
+          <p class="overview-label">오답노트</p>
+          <p class="overview-value" id="ov-wrong"></p>
+        </div>
+      </div>
+
+      <!-- 약점 안내: 숫자만 보여주면 해석은 사용자 몫이 돼요. 결론을 한 문장으로 말해줘요. -->
+      <div id="weak-box" class="card weak-box"></div>
+
+      <h2 class="section-title">단원별로 풀기</h2>
+      <div id="unit-list" class="unit-list"></div>
+    </div>
+
+    <div class="bottom-bar">
+      <div class="wrap bar-row">
+        <button id="subject-wrong-btn" class="secondary">오답노트</button>
+        <button id="subject-all-btn" class="primary">전체 범위 10문제</button>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ 3. 퀴즈 ============ -->
   <section id="screen-quiz" class="screen" hidden>
     <!-- 상단: 나가기(왼쪽 위, 앱에서 흔히 '뒤로'가 있는 자리) + 진행 상황 -->
-    <div class="quiz-top">
-      <div class="wrap quiz-top-row">
+    <div class="top-row-wrap">
+      <div class="wrap top-row">
         <button id="quit-btn" class="icon-btn" aria-label="그만 풀고 나가기">✕</button>
         <div class="progress" aria-hidden="true"><div id="progress-bar"></div></div>
         <span id="quiz-progress" class="progress-text"></span>
@@ -67,7 +109,7 @@
       <h2 id="quiz-question" class="question"></h2>
       <div id="quiz-choices" class="choices"></div>
 
-      <div id="quiz-feedback" class="feedback" hidden>
+      <div id="quiz-feedback" class="card feedback" hidden>
         <p id="feedback-title" class="feedback-title"></p>
         <p id="feedback-text"></p>
         <a id="report-link" class="report-link" target="_blank" rel="noopener" hidden>문제에 오류가 있나요?</a>
@@ -83,7 +125,7 @@
     </div>
   </section>
 
-  <!-- ============ 3. 결과 ============ -->
+  <!-- ============ 4. 결과 ============ -->
   <section id="screen-result" class="screen" hidden>
     <div class="wrap result-body">
       <p class="eyebrow" id="result-subject"></p>
@@ -95,7 +137,7 @@
         <ul id="result-wrong-list"></ul>
       </div>
 
-      <div id="donate-box" class="donate" hidden>
+      <div id="donate-box" class="card donate" hidden>
         <p>도움이 됐다면 커피 한 잔으로 응원해 주세요.<br>더 많은 과목을 만드는 데 쓸게요.</p>
         <a id="donate-link" class="secondary" target="_blank" rel="noopener">☕ 응원하기</a>
       </div>
@@ -103,7 +145,7 @@
 
     <div class="bottom-bar">
       <div class="wrap bar-row">
-        <button id="home-btn" class="secondary">과목 선택</button>
+        <button id="result-back-btn" class="secondary">단원 보기</button>
         <button id="retry-btn" class="primary"></button>
       </div>
     </div>
