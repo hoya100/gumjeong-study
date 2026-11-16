@@ -10,13 +10,29 @@
 import json
 import sys
 
-REQUIRED = ["id", "unit", "question", "choices", "answer", "explanation", "source"]
+import os
+
+REQUIRED = ["id", "unit", "question", "choices", "answer", "explanation", "source", "exam"]
+CONFIG = os.path.join(os.path.dirname(__file__), "..", "data", "config.json")
+
+
+def allowed_units(path):
+    """config.json에서 이 문제 파일을 쓰는 과목의 단원 목록을 찾아요.
+    단원 이름에 오타가 있으면 단원별 통계에서 그 문제가 빠져버리기 때문에 꼭 확인해요."""
+    with open(CONFIG, encoding="utf-8") as f:
+        config = json.load(f)
+    name = os.path.basename(path)
+    for s in config["subjects"]:
+        if s.get("file") and os.path.basename(s["file"]) == name:
+            return {u["name"] for u in s.get("units", [])}
+    return set()
 
 
 def check(path):
     with open(path, encoding="utf-8") as f:
         questions = json.load(f)
 
+    units_ok = allowed_units(path)
     errors = []
     seen_ids = set()
     seen_questions = set()
@@ -27,6 +43,9 @@ def check(path):
         for key in REQUIRED:
             if key not in q or q[key] in ("", None):
                 errors.append(f"{where}: '{key}' 항목이 비어 있어요")
+
+        if units_ok and q.get("unit") not in units_ok:
+            errors.append(f"{where}: 단원 '{q.get('unit')}'이 config.json 단원 목록에 없어요")
 
         if q.get("id") in seen_ids:
             errors.append(f"{where}: id가 중복돼요")
