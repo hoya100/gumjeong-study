@@ -3,6 +3,27 @@
 // 흐름: 설정 불러오기 → 홈(과목) → 과목(단원·약점) → 퀴즈 → 결과
 // =============================================================
 
+// 버전: index.html에 적은 app.js?v=숫자를 그대로 읽어와요.
+// 데이터 파일(config.json, history.json)을 받을 때도 이 숫자를 붙여서,
+// 사이트를 고친 뒤 옛날 데이터가 섞여 나오는 걸 막아요. 숫자는 index.html 한 곳에서만 바꾸면 돼요.
+const APP_VERSION = (() => {
+  try {
+    return new URL(document.currentScript.src).searchParams.get("v") || "dev";
+  } catch (e) {
+    return "dev";
+  }
+})();
+const withVersion = (url) => url + (url.includes("?") ? "&" : "?") + "v=" + APP_VERSION;
+
+// 어디서든 예상 못 한 오류가 나면 빈 화면 대신 안내를 보여줘요.
+// 사용자는 왜 멈췄는지 모르면 그냥 떠나요. 무엇을 하면 되는지 알려주는 게 중요해요.
+function showError() {
+  const banner = document.getElementById("error-banner");
+  if (banner) banner.hidden = false;
+}
+window.addEventListener("error", showError);
+window.addEventListener("unhandledrejection", showError);
+
 // 한 번 퀴즈를 시작했을 때 풀 문제 수.
 // 너무 많으면 지쳐서 중간에 나가요. 10문제면 5분 안쪽이라 부담이 적어요.
 const QUESTIONS_PER_ROUND = 10;
@@ -97,7 +118,8 @@ function showScreen(name) {
 // 같은 파일을 화면 바뀔 때마다 다시 받으면 느리고 데이터도 낭비돼요.
 async function loadQuestions(subject) {
   if (!state.cache[subject.id]) {
-    const res = await fetch(subject.file);
+    const res = await fetch(withVersion(subject.file));
+    if (!res.ok) throw new Error("문제 파일 없음: " + subject.file);
     state.cache[subject.id] = await res.json();
   }
   return state.cache[subject.id];
@@ -481,29 +503,38 @@ document.addEventListener("keydown", (e) => {
 // -------------------------------------------------------------
 async function init() {
   try {
-    const res = await fetch("data/config.json");
+    const res = await fetch(withVersion("data/config.json"));
+    if (!res.ok) throw new Error("config.json 없음");
     state.config = await res.json();
   } catch (e) {
     $("ready-list").textContent = "설정을 불러오지 못했어요. 새로고침해 주세요.";
+    showError();
     return;
   }
 
   document.title = state.config.siteName;
   $("site-name").textContent = state.config.siteName;
 
-  $("next-btn").addEventListener("click", next);
-  $("quit-btn").addEventListener("click", () => openSubject(state.subject));
-  $("subject-back-btn").addEventListener("click", renderHome);
-  $("result-back-btn").addEventListener("click", () => openSubject(state.subject));
-  $("subject-all-btn").addEventListener("click", () => startQuiz("all"));
-  $("subject-wrong-btn").addEventListener("click", () => startQuiz("wrong"));
+  // 버튼 연결. 요소가 없을 때 바로 멈추지 않도록 on() 도우미를 써요.
+  // (지난번 빈 화면은 없는 버튼에 연결하려다 코드 전체가 멈춘 것이었어요.)
+  const on = (id, event, fn) => {
+    const el = $(id);
+    if (el) el.addEventListener(event, fn);
+    else console.warn("화면에 없는 요소:", id);
+  };
+  on("next-btn", "click", next);
+  on("quit-btn", "click", () => openSubject(state.subject));
+  on("subject-back-btn", "click", renderHome);
+  on("result-back-btn", "click", () => openSubject(state.subject));
+  on("subject-all-btn", "click", () => startQuiz("all"));
+  on("subject-wrong-btn", "click", () => startQuiz("wrong"));
 
   // 일부 컴퓨터 브라우저는 숨긴 날짜칸을 눌러도 달력이 안 열려요.
   // 그래서 직접 달력을 열어달라고 요청해요(지원하는 브라우저에서만).
-  $("exam-date-input").addEventListener("click", (e) => {
+  on("exam-date-input", "click", (e) => {
     try { e.target.showPicker(); } catch (err) { /* 미지원이면 기본 동작 */ }
   });
-  $("exam-date-input").addEventListener("change", (e) => {
+  on("exam-date-input", "change", (e) => {
     save("examDate", e.target.value);
     renderDday();
   });
