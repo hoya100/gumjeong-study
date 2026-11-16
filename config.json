@@ -1,0 +1,19 @@
+{
+  "siteName": "검정고시 기출유형 퀴즈",
+  "donateUrl": "",
+  "reportUrl": "",
+  "officialPastExamsUrl": "",
+  "subjects": [
+    { "id": "korean",   "name": "국어",     "file": null },
+    { "id": "math",     "name": "수학",     "file": null },
+    { "id": "english",  "name": "영어",     "file": null },
+    { "id": "social",   "name": "사회",     "file": null },
+    { "id": "science",  "name": "과학",     "file": null },
+    { "id": "history",  "name": "한국사",   "file": "data/history.json" },
+    { "id": "ethics",   "name": "도덕",     "file": null },
+    { "id": "techhome", "name": "기술·가정", "file": null },
+    { "id": "pe",       "name": "체육",     "file": null },
+    { "id": "music",    "name": "음악",     "file": null },
+    { "id": "art",      "name": "미술",     "file": null }
+  ]
+}
