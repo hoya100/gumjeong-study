@@ -1,5 +1,6 @@
 {
   "siteName": "검정고시 기출유형 퀴즈",
+  "about": "검정고시를 준비하며 직접 공부하고 만든 사이트예요. 모든 문제는 만든 사람과 다른 검증 단계에서 정답을 가리고 다시 풀어본 뒤, 통과한 것만 올려요.",
   "donateUrl": "",
   "reportUrl": "",
   "officialPastExamsUrl": "",
@@ -9,7 +10,17 @@
     { "id": "english",  "name": "영어",     "file": null },
     { "id": "social",   "name": "사회",     "file": null },
     { "id": "science",  "name": "과학",     "file": null },
-    { "id": "history",  "name": "한국사",   "file": "data/history.json" },
+    {
+      "id": "history",
+      "name": "한국사",
+      "file": "data/history.json",
+      "units": [
+        { "name": "전근대 한국사의 이해",         "range": "선사 시대 ~ 조선 후기" },
+        { "name": "근대 국민 국가 수립 운동",      "range": "흥선 대원군 ~ 국권 피탈" },
+        { "name": "일제 식민지 지배와 민족 운동",  "range": "1910년 ~ 1945년 광복" },
+        { "name": "대한민국의 발전",              "range": "광복 이후 ~ 현재" }
+      ]
+    },
     { "id": "ethics",   "name": "도덕",     "file": null },
     { "id": "techhome", "name": "기술·가정", "file": null },
     { "id": "pe",       "name": "체육",     "file": null },
