@@ -325,10 +325,14 @@ button.subject-card { width: 100%; border: 2px solid transparent; text-align: le
 .today-plan li.done-msg::before { content: "✓"; color: var(--good); }
 .tomorrow { margin: 12px 0 0; font-size: 13px; color: var(--muted); }
 .tomorrow:empty { display: none; }
-.goal-row { margin-top: 12px; padding-top: 12px; border-top: 1px solid var(--line); display: flex; justify-content: space-between; align-items: center; gap: 8px; font-size: 13px; color: var(--muted); }
-.goal-chips { display: flex; gap: 6px; }
+/* 이름표를 위에, 칩을 아래 한 줄에: '10문제'처럼 단위가 붙어 길어져도 폰에서 한 줄에 들어가요. */
+.goal-row { margin-top: 12px; padding-top: 12px; border-top: 1px solid var(--line); display: grid; gap: 8px; font-size: 13px; color: var(--muted); }
+.goal-chips { display: grid; grid-template-columns: repeat(4, 1fr); gap: 6px; }
 .goal-chip { min-height: 32px; padding: 0 12px; border-radius: 999px; border: 1px solid var(--line); background: var(--card); color: var(--sub); font-size: 13px; font-weight: 500; }
 .goal-chip.on { background: var(--accent); border-color: var(--accent); color: #fff; font-weight: 700; }
+
+.help-list { list-style: none; margin: 20px 0 0; padding: 0; display: grid; gap: 6px; font-size: 13px; color: var(--muted); }
+.help-list strong { color: var(--sub); margin-right: 6px; }
 
 .result-today { margin: 8px 0 0; font-size: 14px; color: var(--accent); font-weight: 700; }
 .result-today:empty { display: none; }
