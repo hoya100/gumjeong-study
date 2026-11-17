@@ -1,6 +1,7 @@
 // =============================================================
 // 검정고시 기출유형 퀴즈 - 동작 코드
 // 흐름: 설정 불러오기 → 홈(과목) → 과목(단원·약점) → 퀴즈 → 결과
+// 문제 종류: 4지선다(기본), 흐름(사건 순서 배열, type: "order")
 // =============================================================
 
 // 버전: index.html에 적은 app.js?v=숫자를 그대로 읽어와요.
@@ -28,9 +29,17 @@ window.addEventListener("unhandledrejection", showError);
 // 너무 많으면 지쳐서 중간에 나가요. 10문제면 5분 안쪽이라 부담이 적어요.
 const QUESTIONS_PER_ROUND = 10;
 
+// 복습은 밀린 게 많아도 한 번에 20문제까지만. 너무 많으면 시작할 엄두가 안 나요.
+const REVIEW_PER_ROUND = 20;
+
 // 약점이라고 판단하려면 그 단원에서 최소 몇 문제는 풀어봐야 해요.
 // 1~2문제로 "약점"이라고 하면 우연히 틀린 걸 약점으로 오해하게 돼요.
 const MIN_SEEN_FOR_WEAK = 3;
+
+// 간격 반복: 틀린 문제를 1일 → 3일 → 7일 뒤에 다시 내줘요.
+// 사람은 잊어버리기 직전에 다시 볼 때 가장 오래 기억해요.
+// 세 번 연속으로 제때 맞히면 "이제 안다"고 보고 복습 목록에서 빼요.
+const REVIEW_GAPS = [1, 3, 7];
 
 // 프로그램이 "지금 어떤 상태인지" 기억하는 곳이에요.
 // 화면을 그릴 때 항상 여기 값을 보고 그려요.
@@ -43,13 +52,16 @@ const state = {
   correctCount: 0,   // 맞힌 개수
   roundWrong: [],    // 이번 판에서 틀린 문제들 (결과 화면에 보여줄 용도)
   answered: false,   // 지금 문제에 답을 했는지
-  mode: "all",       // "all" = 전체, "unit" = 단원, "wrong" = 오답노트
+  picked: [],        // 흐름 문제에서 지금까지 누른 사건들 (순서대로)
+  mode: "all",       // "all" 전체 | "unit" 단원 | "wrong" 오답노트 | "review" 복습 | "flow" 흐름
   unit: null,        // 단원 모드일 때 고른 단원 이름
 };
 
+const MODE_LABEL = { all: "전체 범위", unit: "", wrong: "오답노트", review: "오늘의 복습", flow: "흐름 문제" };
+
 // -------------------------------------------------------------
 // 브라우저 저장소(localStorage) 도우미
-// 서버 없이 사용자 기기 안에 오답노트, 풀이 기록, 시험일을 저장해요.
+// 서버 없이 사용자 기기 안에 기록을 저장해요.
 // 사생활 보호 모드 등에서는 저장소가 막힐 수 있어서
 // try/catch로 감싸 두었어요. 막혀도 퀴즈 자체는 돌아가게요.
 // -------------------------------------------------------------
@@ -79,6 +91,31 @@ const setWrongIds = (subjectId, ids) => save("wrong:" + subjectId, ids);
 const getSeen = (subjectId) => load("seen:" + subjectId, {});
 const setSeen = (subjectId, seen) => save("seen:" + subjectId, seen);
 
+// 복습 일정: { 문제id: { step: 몇 번째 간격인지(0,1,2), due: "다시 볼 날짜" } }
+const getReview = (subjectId) => load("review:" + subjectId, {});
+const setReview = (subjectId, review) => save("review:" + subjectId, review);
+
+// -------------------------------------------------------------
+// 날짜 도우미
+// 날짜를 "2026-11-17" 같은 글자로 저장하면, 글자끼리 크기 비교만으로
+// 어느 날이 먼저인지 알 수 있어요("2026-11-09" < "2026-11-17").
+// -------------------------------------------------------------
+function dateKey(d) {
+  const pad = (n) => String(n).padStart(2, "0");
+  return d.getFullYear() + "-" + pad(d.getMonth() + 1) + "-" + pad(d.getDate());
+}
+const todayKey = () => dateKey(new Date());
+function addDays(days) {
+  const d = new Date();
+  d.setDate(d.getDate() + days);
+  return dateKey(d);
+}
+function dueIds(subjectId) {
+  const review = getReview(subjectId);
+  const today = todayKey();
+  return Object.keys(review).filter((id) => review[id].due <= today);
+}
+
 // -------------------------------------------------------------
 // 작은 도구들
 // -------------------------------------------------------------
@@ -104,7 +141,16 @@ function shuffle(list) {
   return arr;
 }
 
+// 흐름 문제를 섞을 때는 "이미 정답 순서인" 경우를 피해요. 그대로 누르면 맞는 건 문제가 아니니까요.
+function shuffleNotSorted(list) {
+  let arr = shuffle(list);
+  for (let tries = 0; tries < 10 && arr.every((x, i) => x === list[i]); tries++) arr = shuffle(list);
+  return arr;
+}
+
 const percent = (a, b) => (b === 0 ? 0 : Math.round((a / b) * 100));
+const isOrder = (q) => q.type === "order";
+const answerText = (q) => (isOrder(q) ? q.items.join(" → ") : q.choices[q.answer]);
 
 // 화면 전환: 보여줄 화면 하나만 켜고 나머지는 숨겨요.
 function showScreen(name) {
@@ -156,6 +202,7 @@ function computeStats(subject, questions) {
     seenTotal,
     total: questions.length,
     rate: percent(correctTotal, seenTotal),
+    flowCount: questions.filter(isOrder).length,
   };
 }
 
@@ -180,6 +227,15 @@ function renderDday() {
   el.textContent = days > 0 ? "D-" + days : days === 0 ? "오늘이 시험일!" : "시험이 끝났어요";
 }
 
+// 오늘 복습 카드: 홈과 과목 화면에서 같은 모양으로 써요.
+function reviewCardHtml(subjectName, count) {
+  return (
+    '<div class="review-text"><strong>오늘 복습할 문제 ' + count + "개</strong>" +
+    "<small>" + escapeHtml(subjectName) + " · 잊어버리기 전에 다시 보면 오래 기억해요</small></div>" +
+    '<span class="primary go-btn">복습하기</span>'
+  );
+}
+
 // -------------------------------------------------------------
 // 1. 홈 화면
 // -------------------------------------------------------------
@@ -196,9 +252,10 @@ async function renderHome() {
     .join("");
 
   // 풀 수 있는 과목: 카드 전체가 버튼이에요. 어디를 눌러도 과목 화면으로 가요.
-  // (작은 버튼만 누를 수 있으면 손가락이 빗나가기 쉬워요.)
   const readyList = $("ready-list");
+  const reviewList = $("home-review");
   readyList.innerHTML = "";
+  reviewList.innerHTML = "";
   let questionCount = 0;
   for (const subject of ready) {
     let summary = "";
@@ -208,7 +265,17 @@ async function renderHome() {
       const st = computeStats(subject, qs);
       summary = st.seenTotal
         ? st.total + "문제 중 " + st.seenTotal + "문제 풀이 · 정답률 " + st.rate + "%"
-        : st.total + "문제 · 단원별로 풀 수 있어요";
+        : st.total + "문제 · 단원별 · 흐름 문제 " + st.flowCount + "개";
+
+      // 오늘 복습할 게 있으면 홈 맨 위에 카드로 띄워요. 들어오자마자 할 일이 보여야 해요.
+      const due = dueIds(subject.id).length;
+      if (due > 0) {
+        const card = document.createElement("button");
+        card.className = "review-card";
+        card.innerHTML = reviewCardHtml(subject.name, due);
+        card.addEventListener("click", () => { state.subject = subject; startQuiz("review"); });
+        reviewList.appendChild(card);
+      }
     } catch (e) {
       summary = "문제를 불러오지 못했어요";
     }
@@ -234,7 +301,7 @@ async function renderHome() {
 }
 
 // -------------------------------------------------------------
-// 2. 과목 화면: 단원 선택 + 약점 지도
+// 2. 과목 화면: 오늘 복습 + 흐름 문제 + 단원 선택 + 약점 지도
 // -------------------------------------------------------------
 async function openSubject(subject) {
   state.subject = subject;
@@ -252,6 +319,18 @@ async function openSubject(subject) {
   const wrongCount = getWrongIds(subject.id).length;
   $("ov-wrong").textContent = wrongCount + "개";
 
+  // 오늘 복습 카드 (있을 때만)
+  const due = dueIds(subject.id).length;
+  const reviewBox = $("subject-review");
+  reviewBox.innerHTML = "";
+  if (due > 0) {
+    const card = document.createElement("button");
+    card.className = "review-card";
+    card.innerHTML = reviewCardHtml(subject.name, due);
+    card.addEventListener("click", () => startQuiz("review"));
+    reviewBox.appendChild(card);
+  }
+
   // 약점 안내 문장. 상황에 따라 세 가지로 말해요.
   const weakBox = $("weak-box");
   weakBox.classList.toggle("has-weak", Boolean(st.weak));
@@ -265,6 +344,11 @@ async function openSubject(subject) {
     weakBox.textContent =
       "단원마다 " + MIN_SEEN_FOR_WEAK + "문제 이상 풀면 약점 단원을 찾아드려요. 정답률 80% 미만인 단원이 없다면 잘하고 있는 거예요!";
   }
+
+  // 흐름 문제 카드: 이 사이트만의 특징이라 단원 목록보다 위에 따로 보여줘요.
+  const flowBtn = $("flow-card");
+  flowBtn.hidden = st.flowCount === 0;
+  $("flow-count").textContent = "흐름 문제 " + st.flowCount + "개";
 
   // 단원 카드: 카드 전체가 버튼. 정답률 막대 색으로 한눈에 상태를 보여줘요.
   const list = $("unit-list");
@@ -293,7 +377,6 @@ async function openSubject(subject) {
 
 // -------------------------------------------------------------
 // 퀴즈 시작
-// mode: "all"(전체 범위) | "unit"(단원) | "wrong"(오답노트)
 // -------------------------------------------------------------
 async function startQuiz(mode, unit) {
   const subject = state.subject;
@@ -304,19 +387,26 @@ async function startQuiz(mode, unit) {
     return;
   }
 
-  let pool = all;
+  const seen = getSeen(subject.id);
+  // 안 푼 문제를 먼저 내요. 같은 문제만 반복되지 않게요.
+  const freshFirst = (qs) =>
+    shuffle(qs.filter((q) => !(q.id in seen))).concat(shuffle(qs.filter((q) => q.id in seen)));
+
+  let pool;
+  let limit = QUESTIONS_PER_ROUND;
   if (mode === "unit") {
-    pool = all.filter((q) => q.unit === unit);
-    // 단원 안에서는 안 푼 문제를 먼저 내요. 같은 문제만 반복되지 않게요.
-    const seen = getSeen(subject.id);
-    const fresh = shuffle(pool.filter((q) => !(q.id in seen)));
-    const old = shuffle(pool.filter((q) => q.id in seen));
-    pool = fresh.concat(old);
+    pool = freshFirst(all.filter((q) => q.unit === unit));
+  } else if (mode === "flow") {
+    pool = freshFirst(all.filter(isOrder));
   } else if (mode === "wrong") {
     const wrongIds = getWrongIds(subject.id);
     pool = shuffle(all.filter((q) => wrongIds.includes(q.id)));
+  } else if (mode === "review") {
+    const ids = dueIds(subject.id);
+    pool = shuffle(all.filter((q) => ids.includes(q.id)));
+    limit = REVIEW_PER_ROUND;
   } else {
-    pool = shuffle(all);
+    pool = freshFirst(all);
   }
   if (pool.length === 0) {
     openSubject(subject);
@@ -325,7 +415,7 @@ async function startQuiz(mode, unit) {
 
   state.mode = mode;
   state.unit = unit || null;
-  state.questions = pool.slice(0, QUESTIONS_PER_ROUND);
+  state.questions = pool.slice(0, limit);
   state.index = 0;
   state.correctCount = 0;
   state.roundWrong = [];
@@ -341,26 +431,43 @@ function renderQuestion() {
   const q = state.questions[state.index];
   const total = state.questions.length;
   state.answered = false;
+  state.picked = [];
 
   $("quiz-progress").textContent = state.index + 1 + "/" + total;
   // 진행 바: '얼마나 남았는지' 보이면 끝까지 풀 확률이 올라가요.
   $("progress-bar").style.width = (state.index / total) * 100 + "%";
-  $("quiz-unit").textContent = (state.mode === "wrong" ? "오답노트 · " : "") + q.unit;
+  const label = MODE_LABEL[state.mode];
+  $("quiz-unit").textContent = (label && state.mode !== "all" ? label + " · " : "") + q.unit;
   $("quiz-question").textContent = q.question;
   $("quiz-feedback").hidden = true;
 
-  // 답을 고르기 전에는 '다음' 버튼을 회색으로 잠가요.
-  // 버튼이 사라졌다 나타나면 손가락 위치가 흔들리니까, 자리는 그대로 두고 상태만 바꿔요.
-  const nextBtn = $("next-btn");
-  nextBtn.disabled = true;
-  nextBtn.textContent = "정답을 골라주세요";
-
-  // 주소 안의 {id} 자리에 지금 문제 번호를 끼워 넣어요.
-  // 구글폼의 '미리 채워진 링크'와 함께 쓰면 문제 번호 칸이 자동으로 채워져요.
+  // 오류 제보 링크: 주소 안의 {subject}, {id} 자리에 과목과 문제 번호를 끼워 넣어요.
+  // 구글폼 '미리 채워진 링크'와 함께 쓰면 두 칸이 자동으로 채워져요.
   const reportUrl = state.config.reportUrl;
   const report = $("report-link");
   report.hidden = !reportUrl;
-  if (reportUrl) report.href = reportUrl.replace("{id}", encodeURIComponent(q.id));
+  if (reportUrl) {
+    report.href = reportUrl
+      .replace("{subject}", encodeURIComponent(state.subject.name))
+      .replace("{id}", encodeURIComponent(q.id));
+  }
+  // 문제 번호 표시: 제보할 때 이 번호를 보고 적으면 돼요.
+  $("report-id").textContent = state.subject.name + " · 문제 번호 " + q.id;
+
+  const nextBtn = $("next-btn");
+  nextBtn.disabled = true;
+
+  if (isOrder(q)) renderOrder(q);
+  else renderChoice(q);
+}
+
+// 4지선다 그리기
+function renderChoice(q) {
+  $("order-box").hidden = true;
+  $("quiz-choices").hidden = false;
+  // 답을 고르기 전에는 '다음' 버튼을 회색으로 잠가요.
+  // 버튼이 사라졌다 나타나면 손가락 위치가 흔들리니까, 자리는 그대로 두고 상태만 바꿔요.
+  $("next-btn").textContent = "정답을 골라주세요";
 
   // 보기 섞기: 보기마다 "원래 몇 번이었는지"를 같이 들고 다녀야
   // 섞은 뒤에도 정답을 알아볼 수 있어요.
@@ -373,36 +480,91 @@ function renderQuestion() {
     btn.className = "choice";
     btn.innerHTML = '<span class="num">' + (i + 1) + "</span><span>" + escapeHtml(choice.text) + "</span>";
     btn.dataset.correct = String(choice.originalIndex === q.answer);
-    btn.addEventListener("click", () => answer(btn, q));
+    btn.addEventListener("click", () => answerChoice(btn, q));
     box.appendChild(btn);
   });
 }
 
+// 흐름 문제 그리기: 위에는 순서 칸 4개, 아래에는 섞인 사건 버튼 4개.
+// 끌어서 옮기기(드래그)보다 '눌러서 차례대로 고르기'가 폰에서 훨씬 쉽고 실수가 적어요.
+function renderOrder(q) {
+  $("quiz-choices").hidden = true;
+  $("order-box").hidden = false;
+  $("next-btn").textContent = "순서대로 눌러주세요";
+
+  const pool = $("order-pool");
+  pool.hidden = false;
+  $("order-hint").hidden = false;
+  pool.innerHTML = "";
+  // 사건 버튼에는 숫자 대신 '가나다라'를 붙여요. 위 순서 칸의 1~4와 헷갈리지 않게요.
+  const LETTERS = ["가", "나", "다", "라"];
+  shuffleNotSorted(q.items).forEach((item, i) => {
+    const btn = document.createElement("button");
+    btn.className = "choice order-item";
+    btn.dataset.item = item;
+    btn.innerHTML = '<span class="num letter">' + LETTERS[i] + "</span><span>" + escapeHtml(item) + "</span>";
+    btn.addEventListener("click", () => pickOrder(item));
+    pool.appendChild(btn);
+  });
+  drawOrderSlots(q);
+}
+
+// 순서 칸 다시 그리기. 칸을 누르면 그 사건을 빼요(잘못 눌렀을 때 고칠 수 있게).
+function drawOrderSlots(q) {
+  const slots = $("order-slots");
+  slots.innerHTML = "";
+  for (let i = 0; i < q.items.length; i++) {
+    const item = state.picked[i];
+    const slot = document.createElement("button");
+    slot.className = "order-slot" + (item ? " filled" : "");
+    slot.disabled = !item || state.answered;
+    slot.dataset.pos = String(i);
+    slot.innerHTML =
+      '<span class="slot-num">' + (i + 1) + "</span>" +
+      (item ? "<span>" + escapeHtml(item) + "</span>" : '<span class="slot-empty">' + (i === state.picked.length ? "여기에 들어가요" : "") + "</span>");
+    if (item) slot.addEventListener("click", () => unpickOrder(i));
+    slots.appendChild(slot);
+  }
+
+  // 이미 고른 사건 버튼은 흐리게 잠가요.
+  document.querySelectorAll(".order-item").forEach((btn) => {
+    btn.disabled = state.answered || state.picked.includes(btn.dataset.item);
+    btn.classList.toggle("used", state.picked.includes(btn.dataset.item));
+  });
+
+  if (!state.answered) {
+    const full = state.picked.length === q.items.length;
+    $("next-btn").disabled = !full;
+    $("next-btn").textContent = full ? "정답 확인" : "순서대로 눌러주세요";
+  }
+}
+
+function pickOrder(item) {
+  const q = state.questions[state.index];
+  if (state.answered || state.picked.includes(item)) return;
+  state.picked.push(item);
+  drawOrderSlots(q);
+}
+
+function unpickOrder(pos) {
+  const q = state.questions[state.index];
+  if (state.answered) return;
+  state.picked.splice(pos, 1);
+  drawOrderSlots(q);
+}
+
 // -------------------------------------------------------------
-// 보기를 눌렀을 때
+// 채점 결과 기록 (두 문제 종류가 함께 써요)
 // -------------------------------------------------------------
-function answer(clicked, q) {
-  if (state.answered) return; // 두 번 눌러도 한 번만 처리
-  state.answered = true;
-  const isCorrect = clicked.dataset.correct === "true";
+function recordResult(q, isCorrect) {
   const subjectId = state.subject.id;
 
-  // 정답은 초록, 고른 오답은 빨강, 나머지는 흐리게.
-  document.querySelectorAll(".choice").forEach((btn) => {
-    btn.disabled = true;
-    if (btn.dataset.correct === "true") btn.classList.add("correct");
-    else if (btn !== clicked) btn.classList.add("dim");
-  });
-  if (!isCorrect) clicked.classList.add("wrong");
-
-  // 풀이 기록 저장 (약점 지도용)
+  // 풀이 기록 (약점 지도용)
   const seen = getSeen(subjectId);
   seen[q.id] = isCorrect ? 1 : 0;
   setSeen(subjectId, seen);
 
-  // 오답노트 갱신
-  // - 틀리면 추가 (이미 있으면 그대로)
-  // - 어느 모드에서든 맞히면 빼기: 이제 아는 문제니까요
+  // 오답노트: 틀리면 넣고, 어느 모드에서든 맞히면 빼요.
   let wrongIds = getWrongIds(subjectId);
   if (isCorrect) {
     state.correctCount++;
@@ -413,11 +575,27 @@ function answer(clicked, q) {
   }
   setWrongIds(subjectId, wrongIds);
 
-  // 해설: 틀렸을 때 "왜"를 바로 알려주는 게 학습 효과가 제일 커요.
+  // 복습 일정
+  // - 틀리면: 처음부터 다시, 내일 복습
+  // - 복습할 날에 맞히면: 다음 간격으로(1일 → 3일 → 7일), 세 번 다 맞히면 졸업
+  // - 아직 복습할 날이 아닌데 맞힌 건 그대로 둬요. 너무 빨리 다시 본 건 기억력 확인이 아니니까요.
+  const review = getReview(subjectId);
+  if (!isCorrect) {
+    review[q.id] = { step: 0, due: addDays(REVIEW_GAPS[0]) };
+  } else if (review[q.id] && review[q.id].due <= todayKey()) {
+    const step = review[q.id].step + 1;
+    if (step >= REVIEW_GAPS.length) delete review[q.id];
+    else review[q.id] = { step, due: addDays(REVIEW_GAPS[step]) };
+  }
+  setReview(subjectId, review);
+}
+
+// 해설 보여주기 + 다음 버튼 열기 (두 문제 종류 공통)
+function showFeedback(q, isCorrect, extra) {
   const title = $("feedback-title");
   title.textContent = isCorrect ? "정답이에요" : "아쉬워요";
   title.className = "feedback-title " + (isCorrect ? "good" : "bad");
-  $("feedback-text").textContent = q.explanation;
+  $("feedback-text").textContent = (extra ? extra + " " : "") + q.explanation;
   $("quiz-feedback").hidden = false;
 
   const last = state.index === state.questions.length - 1;
@@ -429,8 +607,51 @@ function answer(clicked, q) {
   $("quiz-feedback").scrollIntoView({ behavior: "smooth", block: "nearest" });
 }
 
+// 4지선다: 보기를 눌렀을 때
+function answerChoice(clicked, q) {
+  if (state.answered) return; // 두 번 눌러도 한 번만 처리
+  state.answered = true;
+  const isCorrect = clicked.dataset.correct === "true";
+
+  // 정답은 초록, 고른 오답은 빨강, 나머지는 흐리게.
+  document.querySelectorAll("#quiz-choices .choice").forEach((btn) => {
+    btn.disabled = true;
+    if (btn.dataset.correct === "true") btn.classList.add("correct");
+    else if (btn !== clicked) btn.classList.add("dim");
+  });
+  if (!isCorrect) clicked.classList.add("wrong");
+
+  recordResult(q, isCorrect);
+  showFeedback(q, isCorrect);
+}
+
+// 흐름 문제: '정답 확인'을 눌렀을 때
+function checkOrder() {
+  const q = state.questions[state.index];
+  state.answered = true;
+  const isCorrect = state.picked.every((item, i) => item === q.items[i]);
+
+  // 칸마다 맞은 자리면 초록, 틀린 자리면 빨강
+  drawOrderSlots(q);
+  document.querySelectorAll(".order-slot").forEach((slot, i) => {
+    slot.classList.add(state.picked[i] === q.items[i] ? "correct" : "wrong");
+  });
+
+  // 확인 뒤에는 사건 버튼이 더 필요 없어요. 숨겨야 해설이 바로 아래에 붙어서 폰에서도 보여요.
+  $("order-pool").hidden = true;
+  $("order-hint").hidden = true;
+
+  recordResult(q, isCorrect);
+  showFeedback(q, isCorrect, isCorrect ? "" : "정답 순서:");
+}
+
 function next() {
-  if (!state.answered) return;
+  const q = state.questions[state.index];
+  if (!state.answered) {
+    // 흐름 문제에서 4칸을 다 채우고 누르면 '정답 확인'
+    if (isOrder(q) && state.picked.length === q.items.length) checkOrder();
+    return;
+  }
   if (state.index < state.questions.length - 1) {
     state.index++;
     renderQuestion();
@@ -447,32 +668,36 @@ function renderResult() {
   const total = state.questions.length;
   const score = state.correctCount;
 
-  const label =
-    state.mode === "wrong" ? " 오답노트" : state.mode === "unit" ? " · " + state.unit : " 전체 범위";
-  $("result-subject").textContent = state.subject.name + label;
+  const label = state.mode === "unit" ? state.unit : MODE_LABEL[state.mode];
+  $("result-subject").textContent = state.subject.name + " · " + label;
   $("result-score").innerHTML = score + "<small> / " + total + "</small>";
 
   const rate = score / total;
   $("result-message").textContent =
+    state.mode === "review" && rate === 1 ? "오늘 복습 끝! 다음 복습 날짜에 다시 알려드릴게요." :
     rate === 1 ? "전부 맞혔어요! 이 범위는 자신 있어도 돼요." :
-    rate >= 0.6 ? "좋아요. 틀린 문제만 한 번 더 보면 완벽해요." :
-    "괜찮아요. 해설을 읽고 오답노트로 다시 풀어보세요.";
+    rate >= 0.6 ? "좋아요. 틀린 문제는 내일 복습 목록에 자동으로 올라가요." :
+    "괜찮아요. 틀린 문제는 내일 복습 목록에 자동으로 올라가요.";
 
   // 틀린 문제 목록: 무엇을 틀렸는지 한눈에 보여야 다시 풀 마음이 생겨요.
   $("result-wrong-list").innerHTML = state.roundWrong
-    .map((q) => "<li>" + escapeHtml(q.question) + "<span>정답: " + escapeHtml(q.choices[q.answer]) + "</span></li>")
+    .map((q) =>
+      "<li>" + escapeHtml(isOrder(q) ? "[흐름] " + q.items.slice().sort().join(", ") : q.question) +
+      "<span>정답: " + escapeHtml(answerText(q)) + "</span></li>")
     .join("");
   $("result-wrong").hidden = state.roundWrong.length === 0;
 
-  // 가장 권하고 싶은 행동을 오른쪽 큰 파란 버튼에:
-  // 이번에 틀린 게 있으면 '오답 다시 풀기', 다 맞았으면 같은 범위로 한 판 더.
+  // 가장 권하고 싶은 행동을 오른쪽 큰 파란 버튼에.
   const retry = $("retry-btn");
   if (state.roundWrong.length > 0) {
     retry.textContent = "틀린 문제 다시 풀기";
     retry.onclick = () => startQuiz("wrong");
+  } else if (state.mode === "review" || state.mode === "wrong") {
+    retry.textContent = "새 문제 풀기";
+    retry.onclick = () => startQuiz("all");
   } else {
     retry.textContent = "한 판 더";
-    retry.onclick = () => startQuiz(state.mode === "wrong" ? "all" : state.mode, state.unit);
+    retry.onclick = () => startQuiz(state.mode, state.unit);
   }
 
   // 후원 안내는 결과 화면에서만: 도움을 받은 "뒤"에 부탁해야 거부감이 적어요.
@@ -489,14 +714,32 @@ function renderResult() {
 // -------------------------------------------------------------
 document.addEventListener("keydown", (e) => {
   if ($("screen-quiz").hidden) return;
+  const q = state.questions[state.index];
   if (["1", "2", "3", "4"].includes(e.key) && !state.answered) {
-    const btn = document.querySelectorAll(".choice")[Number(e.key) - 1];
-    if (btn) btn.click();
-  } else if (e.key === "Enter" && state.answered) {
+    const selector = isOrder(q) ? ".order-item" : "#quiz-choices .choice";
+    const btn = document.querySelectorAll(selector)[Number(e.key) - 1];
+    if (btn && !btn.disabled) btn.click();
+  } else if (e.key === "Backspace" && isOrder(q) && !state.answered && state.picked.length) {
+    unpickOrder(state.picked.length - 1);
+  } else if (e.key === "Enter") {
     e.preventDefault();
     next();
   }
 });
+
+// -------------------------------------------------------------
+// 방문자 통계 (Cloudflare Web Analytics)
+// config.json에 토큰이 있을 때만 켜요. 쿠키를 쓰지 않고 개인을 추적하지 않는 방식이에요.
+// -------------------------------------------------------------
+function startAnalytics() {
+  const token = state.config.analyticsToken;
+  if (!token) return;
+  const s = document.createElement("script");
+  s.defer = true;
+  s.src = "https://static.cloudflareinsights.com/beacon.min.js";
+  s.setAttribute("data-cf-beacon", JSON.stringify({ token }));
+  document.head.appendChild(s);
+}
 
 // -------------------------------------------------------------
 // 시작
@@ -516,7 +759,7 @@ async function init() {
   $("site-name").textContent = state.config.siteName;
 
   // 버튼 연결. 요소가 없을 때 바로 멈추지 않도록 on() 도우미를 써요.
-  // (지난번 빈 화면은 없는 버튼에 연결하려다 코드 전체가 멈춘 것이었어요.)
+  // (예전에 빈 화면이 된 건 없는 버튼에 연결하려다 코드 전체가 멈춘 것이었어요.)
   const on = (id, event, fn) => {
     const el = $(id);
     if (el) el.addEventListener(event, fn);
@@ -528,6 +771,7 @@ async function init() {
   on("result-back-btn", "click", () => openSubject(state.subject));
   on("subject-all-btn", "click", () => startQuiz("all"));
   on("subject-wrong-btn", "click", () => startQuiz("wrong"));
+  on("flow-card", "click", () => startQuiz("flow"));
 
   // 일부 컴퓨터 브라우저는 숨긴 날짜칸을 눌러도 달력이 안 열려요.
   // 그래서 직접 달력을 열어달라고 요청해요(지원하는 브라우저에서만).
@@ -539,6 +783,7 @@ async function init() {
     renderDday();
   });
 
+  startAnalytics();
   renderHome();
 }
 
