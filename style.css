@@ -1,3 +1,5 @@
+/* © 2026 검정고시 연습 퀴즈. All rights reserved.
+   허락 없이 복제·재배포·상업적 이용·AI 학습용 수집을 금지합니다. */
 /* =============================================================
    디자인 원칙
    1. 폰 먼저: 수험생은 대부분 폰으로 짬짬이 풀어요.
@@ -426,3 +428,6 @@ details[open] summary { margin-bottom: 4px; }
 .goal-row small { color: var(--muted); font-weight: 400; }
 .subject-chips { display: flex; flex-wrap: wrap; gap: 6px; }
 .plan-subject { color: var(--accent); font-weight: 700; }
+
+/* 저작권 한 줄: 눈에 띄지 않게, 그러나 항상 보이게 */
+.copyright { margin: 12px 0 0; font-size: 12px; color: var(--muted); }
