@@ -398,3 +398,31 @@ details[open] summary { margin-bottom: 4px; }
 
 /* 응원 버튼을 누른 뒤 고마움 + 솔직한 안내 */
 .support-thanks { margin: 0; font-size: 14px; color: var(--accent); line-height: 1.6; }
+
+/* =============================================================
+   v15: 결과 화면 정리 + 내 시험 과목
+   ============================================================= */
+/* 결과 화면 왼쪽 위 '‹ 홈' */
+.result-top { padding-top: 12px; }
+.back-btn {
+  border: none; background: var(--card); color: var(--sub);
+  border-radius: 999px; padding: 8px 14px; font-size: 14px; font-weight: 500;
+}
+.result-body { padding-top: 16px; }
+
+/* 응원: 점수 바로 아래 작은 한 줄. 메인 행동(파란 버튼)과 경쟁하지 않게 조용한 모양으로. */
+.donate-line { margin: 16px 0 8px; }
+.support-pill {
+  display: inline-block; border: 1px solid var(--line); background: var(--card);
+  color: var(--sub); border-radius: 999px; padding: 8px 16px;
+  font-size: 14px; font-weight: 500; text-decoration: none;
+}
+.donate-line .support-thanks { font-size: 13px; }
+.result-wrong { margin-top: 24px; }
+.more-btn { display: block; margin: 12px auto 0; }
+.result-wrong li .tag { display: inline; color: var(--accent); font-size: 12px; font-weight: 700; margin: 0 6px 0 0; }
+
+/* 내 시험 과목 칩: 여러 개를 켜고 끌 수 있어요 */
+.goal-row small { color: var(--muted); font-weight: 400; }
+.subject-chips { display: flex; flex-wrap: wrap; gap: 6px; }
+.plan-subject { color: var(--accent); font-weight: 700; }
