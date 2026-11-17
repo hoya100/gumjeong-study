@@ -302,6 +302,37 @@ button.subject-card { width: 100%; border: 2px solid transparent; text-align: le
 .order-hint { margin: 14px 0 10px; font-size: 13px; color: var(--muted); }
 .order-item.used { opacity: 0.35; }
 
+/* ---------- 오늘의 한마디 ---------- */
+/* 카드 배경 없이 왼쪽 선만: 다른 카드(할 일)와 구별되는 '읽을거리' 느낌 */
+.quote-card { margin: 0 0 16px; padding: 4px 0 4px 16px; border-left: 3px solid var(--accent); }
+.quote-label { margin: 0; font-size: 12px; font-weight: 700; color: var(--accent); }
+.quote-text { margin: 4px 0 0; font-size: 16px; font-weight: 500; line-height: 1.55; }
+.quote-author { margin: 4px 0 0; font-size: 13px; color: var(--muted); }
+.quote-author:empty { display: none; }
+
+/* ---------- 오늘의 학습 ---------- */
+.today-card { margin-bottom: 12px; }
+.today-head { display: flex; justify-content: space-between; align-items: baseline; }
+.today-title { margin: 0; font-size: 17px; font-weight: 700; }
+.today-count { font-size: 15px; font-weight: 700; color: var(--accent); font-variant-numeric: tabular-nums; }
+.today-bar { margin: 10px 0 14px; }
+.today-bar div { background: var(--accent); transition: width 0.3s; }
+.today-bar div.done { background: var(--good); }
+.today-plan { list-style: none; margin: 0 0 14px; padding: 0; display: grid; gap: 6px; font-size: 15px; color: var(--sub); }
+.today-plan li { display: flex; gap: 8px; }
+.today-plan li::before { content: "•"; color: var(--accent); font-weight: 700; }
+.today-plan li.done-msg { color: var(--good); font-weight: 700; }
+.today-plan li.done-msg::before { content: "✓"; color: var(--good); }
+.tomorrow { margin: 12px 0 0; font-size: 13px; color: var(--muted); }
+.tomorrow:empty { display: none; }
+.goal-row { margin-top: 12px; padding-top: 12px; border-top: 1px solid var(--line); display: flex; justify-content: space-between; align-items: center; gap: 8px; font-size: 13px; color: var(--muted); }
+.goal-chips { display: flex; gap: 6px; }
+.goal-chip { min-height: 32px; padding: 0 12px; border-radius: 999px; border: 1px solid var(--line); background: var(--card); color: var(--sub); font-size: 13px; font-weight: 500; }
+.goal-chip.on { background: var(--accent); border-color: var(--accent); color: #fff; font-weight: 700; }
+
+.result-today { margin: 8px 0 0; font-size: 14px; color: var(--accent); font-weight: 700; }
+.result-today:empty { display: none; }
+
 /* ---------- 오류 안내 ---------- */
 .error-banner {
   position: fixed; left: 16px; right: 16px; top: 16px; z-index: 10;
