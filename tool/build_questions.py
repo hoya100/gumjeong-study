@@ -1,3 +1,4 @@
+# © 2026 검정고시 연습 퀴즈. All rights reserved. 허락 없이 복제·재배포 금지.
 """신규 문제 원본(new_questions.py)을 data/history.json에 합치는 스크립트.
 
 사용법: python3 tools/build_questions.py
