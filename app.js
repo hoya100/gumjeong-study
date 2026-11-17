@@ -57,7 +57,7 @@ const state = {
   unit: null,        // 단원 모드일 때 고른 단원 이름
 };
 
-const MODE_LABEL = { all: "전체 범위", unit: "", wrong: "오답노트", review: "오늘의 복습", flow: "흐름 문제", today: "오늘의 학습" };
+const MODE_LABEL = { all: "전체 범위", unit: "", wrong: "오답노트", review: "오늘의 복습", flow: "흐름 문제", today: "오늘의 학습", again: "틀린 문제 다시" };
 
 // 하루 목표로 고를 수 있는 문제 수. 기본은 20문제(약 10분).
 const DAILY_GOALS = [10, 20, 30, 50];
@@ -287,79 +287,131 @@ function pickUnit(st, except) {
   return open.slice().sort((a, b) => a.seen / a.total - b.seen / b.total)[0];
 }
 
-function makePlan(subject, st) {
-  const goal = getGoal();
-  const done = getDoneToday();
-  const remaining = Math.max(goal - done, 0);
-  const due = dueIds(subject.id).length;
-  const reviewPart = Math.min(due, remaining);
-  const unit = pickUnit(st);
-
-  // 새 문제는 '그 단원에 실제로 남은 안 푼 문제 수'까지만 추천해요.
-  // 모자라면 다음 추천 단원으로 넘겨요. (예전엔 30문제짜리 단원에 '새 문제 50개'라고 나오는 버그가 있었어요.)
-  const newParts = [];
-  let need = remaining - reviewPart;
+// 한 과목 안에서 새 문제 count개를 어느 단원에서 낼지 정해요.
+// 추천 단원(약점 → 덜 푼 단원)부터 채우고, 그 단원에 남은 문제가 모자라면 다음 단원으로 넘겨요.
+// (예전엔 30문제짜리 단원에 '새 문제 50개'라고 나오는 버그가 있었어요.)
+function fillUnits(st, count) {
+  const parts = [];
+  let need = count;
   const used = new Set();
-  let u = unit;
+  let u = pickUnit(st);
   while (need > 0 && u) {
-    const left = u.total - u.seen;
-    const take = Math.min(left, need);
-    if (take > 0) newParts.push({ unit: u, count: take });
+    const take = Math.min(u.total - u.seen, need);
+    if (take > 0) parts.push({ unit: u, count: take });
     need -= take;
     used.add(u.name);
     u = st.units
       .filter((x) => !used.has(x.name) && x.seen < x.total)
       .sort((a, b) => a.seen / a.total - b.seen / b.total)[0];
   }
-  const newPart = newParts.reduce((sum, p) => sum + p.count, 0);
-  return { goal, done, remaining, due, reviewPart, newPart, newParts, unit };
+  return parts;
 }
 
-function renderToday(subject, questions, st) {
-  const plan = makePlan(subject, st);
-  state.todayPlan = { subjectId: subject.id, unit: plan.unit ? plan.unit.name : null };
+// -------------------------------------------------------------
+// 내 시험 과목: 오늘의 학습에 섞어 넣을 과목들.
+// 처음엔 문제가 있는 과목 전부. 사용자가 끄고 켤 수 있어요(최소 1과목).
+// -------------------------------------------------------------
+function readySubjects() {
+  return state.config.subjects.filter((s) => s.file);
+}
+function getMySubjects() {
+  const ready = readySubjects();
+  const saved = load("mySubjects", null);
+  const mine = Array.isArray(saved) ? ready.filter((s) => saved.includes(s.id)) : [];
+  return mine.length ? mine : ready;
+}
+
+// -------------------------------------------------------------
+// 여러 과목 계획 세우기
+//   1순위: 모든 과목의 오늘 복습할 문제
+//   2순위: 남은 목표를 과목들에 고르게 나눈 새 문제
+// 고르게 나누는 방법: 한 문제씩 과목을 돌아가며 배정해요(카드 나눠주듯이).
+// 시작 과목은 날짜마다 바뀌어서, 매일 같은 과목만 먼저 나오지 않아요.
+// -------------------------------------------------------------
+function makePlan(entries) {
+  const goal = getGoal();
+  const done = getDoneToday();
+  const remaining = Math.max(goal - done, 0);
+
+  let left = remaining;
+  const reviewParts = [];
+  entries.forEach((e) => {
+    const due = dueIds(e.subject.id).length;
+    const take = Math.min(due, left);
+    if (take > 0) reviewParts.push({ subject: e.subject, count: take });
+    left -= take;
+  });
+
+  // 과목별 '아직 안 푼 문제 수'까지만 배정할 수 있어요.
+  const share = entries.map(() => 0);
+  const cap = entries.map((e) => e.st.total - e.st.seenTotal);
+  const n = entries.length;
+  let i = n ? dayNumber() % n : 0;
+  let idle = 0;
+  while (left > 0 && n && idle < n) {
+    if (share[i] < cap[i]) { share[i]++; left--; idle = 0; } else idle++;
+    i = (i + 1) % n;
+  }
+  const newParts = [];
+  entries.forEach((e, k) => {
+    fillUnits(e.st, share[k]).forEach((p) => newParts.push({ subject: e.subject, st: e.st, unit: p.unit, count: p.count }));
+  });
+
+  const reviewPart = reviewParts.reduce((sum, p) => sum + p.count, 0);
+  const newPart = newParts.reduce((sum, p) => sum + p.count, 0);
+  return { goal, done, remaining, reviewParts, reviewPart, newParts, newPart };
+}
+
+function renderToday(entries) {
+  const plan = makePlan(entries);
+  state.todayPlan = plan;
+  const multi = entries.length > 1;
+  const tag = (subject) => (multi ? '<span class="plan-subject">' + escapeHtml(subject.name) + "</span> " : "");
 
   $("today-count").textContent = Math.min(plan.done, plan.goal) + " / " + plan.goal + "문제";
   const bar = $("today-bar");
   bar.style.width = Math.min(100, percent(plan.done, plan.goal)) + "%";
   bar.classList.toggle("done", plan.remaining === 0);
 
-  // 오늘 할 일 목록
+  // 오늘 할 일 목록. 과목이 여러 개면 줄마다 과목 이름을 앞에 붙여요.
   const items = [];
   if (plan.remaining === 0) {
     items.push('<li class="done-msg">오늘 목표 달성! 더 풀면 내일이 더 가벼워져요.</li>');
   } else {
-    if (plan.reviewPart > 0) items.push("<li>복습 " + plan.reviewPart + "문제 · 잊어버리기 전에 다시 보기</li>");
+    plan.reviewParts.forEach((p) => items.push("<li>" + tag(p.subject) + "복습 " + p.count + "문제</li>"));
     plan.newParts.forEach((p) => {
-      const why = st.weak && p.unit.name === st.weak.name ? " (약점 단원)" : "";
-      items.push("<li>새 문제 " + p.count + "개 · " + escapeHtml(p.unit.name) + why + "</li>");
+      const why = p.st.weak && p.unit.name === p.st.weak.name ? " (약점 단원)" : "";
+      items.push("<li>" + tag(p.subject) + "새 문제 " + p.count + "개 · " + escapeHtml(p.unit.name) + why + "</li>");
     });
-    if (!items.length) items.push("<li>모든 문제를 한 번씩 풀었어요! 전체 범위로 다시 다져보세요.</li>");
+    if (!items.length) items.push("<li>고른 과목의 문제를 모두 한 번씩 풀었어요! 과목을 눌러 전체 범위로 다시 다져보세요.</li>");
   }
   $("today-plan").innerHTML = items.join("");
 
   const start = $("today-start");
+  const nothing = plan.reviewPart + plan.newPart === 0;
+  start.hidden = plan.remaining > 0 && nothing;
   start.textContent = plan.remaining === 0 ? "한 판 더 풀기" : plan.done === 0 ? "오늘 계획대로 시작" : "이어서 하기";
   start.onclick = () => {
-    state.subject = subject;
-    startQuiz(plan.remaining === 0 ? "all" : "today");
+    if (plan.remaining === 0) {
+      // 목표를 채웠으면 계획 대신, 고른 과목 중 하나(날마다 바뀜)에서 한 판 더.
+      state.subject = entries[dayNumber() % entries.length].subject;
+      startQuiz("all");
+    } else startQuiz("today");
   };
 
-  // 내일 미리보기: 내일까지 쌓일 복습 + 오늘 단원 다음으로 추천할 단원
-  const tomorrowDue = dueIdsBy(subject.id, addDays(1)).length;
-  const nextUnit = pickUnit(st, plan.unit ? plan.unit.name : null) || plan.unit;
-  const parts = [];
-  if (tomorrowDue > 0) parts.push("복습 " + tomorrowDue + "문제");
-  if (nextUnit) parts.push(nextUnit.name);
-  $("tomorrow-text").textContent = parts.length ? "내일은 " + parts.join(" + ") + " 순서로 추천해요." : "";
+  // 내일 미리보기: 내일까지 쌓일 복습 문제 수 (모든 고른 과목 합계)
+  const tomorrowDue = entries.reduce((sum, e) => sum + dueIdsBy(e.subject.id, addDays(1)).length, 0);
+  $("tomorrow-text").textContent = tomorrowDue > 0
+    ? "내일은 복습 " + tomorrowDue + "문제부터 시작해요."
+    : "틀린 문제는 다음 날 복습으로 다시 나와요.";
 
-  // 목표 바꾸기: 평소엔 "목표 20문제 · 변경" 글자만 보이고, 누르면 칩이 펼쳐져요.
+  // 설정 열기/닫기: 평소엔 "하루 20문제 · 4과목 · 변경" 한 줄만 보여요.
   const toggle = $("goal-toggle");
-  toggle.textContent = "하루 목표 " + plan.goal + "문제 · " + (state.goalOpen ? "닫기" : "변경");
+  toggle.textContent = "하루 " + plan.goal + "문제 · " + entries.length + "과목 · " + (state.goalOpen ? "닫기" : "변경");
   toggle.setAttribute("aria-expanded", String(Boolean(state.goalOpen)));
   toggle.onclick = () => {
     state.goalOpen = !state.goalOpen;
-    renderToday(subject, questions, st);
+    renderToday(entries);
   };
   $("goal-row").hidden = !state.goalOpen;
 
@@ -373,10 +425,28 @@ function renderToday(subject, questions, st) {
     chip.setAttribute("aria-label", "하루 " + g + "문제");
     chip.addEventListener("click", () => {
       save("dailyGoal", g);
-      state.goalOpen = false; // 고르면 다시 접어요. 할 일은 끝났으니까요.
-      renderToday(subject, questions, st);
+      renderToday(entries);
     });
     chips.appendChild(chip);
+  });
+
+  // 내 시험 과목 칩: 눌러서 켜고 끄기. 마지막 한 과목은 끌 수 없어요(계획이 비면 안 되니까요).
+  const mine = getMySubjects().map((s) => s.id);
+  const sChips = $("subject-chips");
+  sChips.innerHTML = "";
+  readySubjects().forEach((s) => {
+    const on = mine.includes(s.id);
+    const chip = document.createElement("button");
+    chip.className = "goal-chip" + (on ? " on" : "");
+    chip.textContent = s.name;
+    chip.setAttribute("aria-pressed", String(on));
+    chip.addEventListener("click", () => {
+      const next = on ? mine.filter((id) => id !== s.id) : mine.concat(s.id);
+      if (!next.length) return;
+      save("mySubjects", next);
+      renderHome();
+    });
+    sChips.appendChild(chip);
   });
 
   $("today-card").hidden = false;
@@ -386,7 +456,7 @@ function renderToday(subject, questions, st) {
 // 1. 홈 화면
 // -------------------------------------------------------------
 async function renderHome() {
-  const ready = state.config.subjects.filter((s) => s.file);
+  const ready = readySubjects();
   const soon = state.config.subjects.filter((s) => !s.file);
 
   showScreen("home");
@@ -403,7 +473,9 @@ async function renderHome() {
   const readyList = $("ready-list");
   readyList.innerHTML = "";
   let questionCount = 0;
-  let todayDrawn = false;
+  // 오늘의 학습은 '내 시험 과목' 전체를 보고 계획해요.
+  const mineIds = getMySubjects().map((s) => s.id);
+  const entries = [];
   for (const subject of ready) {
     let summary = "";
     try {
@@ -412,13 +484,9 @@ async function renderHome() {
       const st = computeStats(subject, qs);
       summary = st.seenTotal
         ? st.seenTotal + "/" + st.total + "문제 풀이 · 정답률 " + st.rate + "%"
-        : st.total + "문제 · 흐름 문제 " + st.flowCount + "개";
+        : st.total + "문제" + (st.flowCount ? " · 흐름 문제 " + st.flowCount + "개" : "");
 
-      // 오늘의 학습 카드는 첫 번째 과목 기준으로 그려요. (과목이 늘면 과목별로 나눌 수 있어요)
-      if (!todayDrawn) {
-        renderToday(subject, qs, st);
-        todayDrawn = true;
-      }
+      if (mineIds.includes(subject.id)) entries.push({ subject, st });
     } catch (e) {
       summary = "문제를 불러오지 못했어요";
     }
@@ -431,6 +499,8 @@ async function renderHome() {
     card.addEventListener("click", () => openSubject(subject));
     readyList.appendChild(card);
   }
+
+  if (entries.length) renderToday(entries);
 
   // 신뢰 카드
   $("about-text").textContent = state.config.about || "";
@@ -525,6 +595,8 @@ async function openSubject(subject) {
 // 퀴즈 시작
 // -------------------------------------------------------------
 async function startQuiz(mode, unit) {
+  if (mode === "today") return startToday();
+  if (mode === "again") return startRound("again", null, shuffle(state.lastWrong || []), QUESTIONS_PER_ROUND);
   const subject = state.subject;
   let all;
   try {
@@ -551,19 +623,6 @@ async function startQuiz(mode, unit) {
     const ids = dueIds(subject.id);
     pool = shuffle(all.filter((q) => ids.includes(q.id)));
     limit = REVIEW_PER_ROUND;
-  } else if (mode === "today") {
-    // 오늘의 학습: 복습할 문제 먼저 → 추천 단원의 새 문제 → 그래도 모자라면 다른 단원의 새 문제.
-    // 한 판은 10문제까지. 목표가 20이면 두 판으로 나눠서 풀어요(한 번에 너무 길면 지쳐요).
-    const ids = dueIds(subject.id);
-    const review = shuffle(all.filter((q) => ids.includes(q.id)));
-    const picked = new Set(review.map((q) => q.id));
-    const rec = state.todayPlan && state.todayPlan.unit;
-    const fresh = freshFirst(all.filter((q) => !picked.has(q.id) && !(q.id in seen)));
-    const recFirst = fresh.filter((q) => q.unit === rec).concat(fresh.filter((q) => q.unit !== rec));
-    pool = review.concat(recFirst);
-    const remaining = Math.max(getGoal() - getDoneToday(), 1);
-    limit = Math.min(QUESTIONS_PER_ROUND, remaining);
-    if (pool.length === 0) pool = freshFirst(all); // 다 풀었으면 전체에서
   } else {
     pool = freshFirst(all);
   }
@@ -572,15 +631,63 @@ async function startQuiz(mode, unit) {
     return;
   }
 
+  startRound(mode, unit, pool.map((q) => tagQuestion(q, subject)), limit);
+}
+
+// 문제에 '어느 과목 문제인지' 표시를 붙여요(원본은 건드리지 않고 복사본에).
+// 오늘의 학습처럼 여러 과목이 한 판에 섞이면, 기록을 어느 과목 칸에 저장할지 알아야 하거든요.
+function tagQuestion(q, subject) {
+  return Object.assign({}, q, { _sid: subject.id, _sname: subject.name });
+}
+
+function startRound(mode, unit, pool, limit) {
+  if (!pool.length) return renderHome();
   state.mode = mode;
   state.unit = unit || null;
   state.questions = pool.slice(0, limit);
   state.index = 0;
   state.correctCount = 0;
   state.roundWrong = [];
-
   renderQuestion();
   showScreen("quiz");
+}
+
+// 오늘의 학습: 계획표 순서 그대로 문제를 모아요.
+//   복습(모든 과목) → 과목별·단원별 새 문제 → 모자라면 고른 과목의 다른 새 문제
+// 한 판은 10문제까지. 목표가 20이면 두 판으로 나눠 풀어요(한 번에 너무 길면 지쳐요).
+async function startToday() {
+  const plan = state.todayPlan;
+  if (!plan) return renderHome();
+  const pool = [];
+  const used = new Set();
+  const add = (q, subject) => {
+    const key = subject.id + ":" + q.id;
+    if (used.has(key)) return;
+    used.add(key);
+    pool.push(tagQuestion(q, subject));
+  };
+  try {
+    for (const p of plan.reviewParts) {
+      const ids = dueIds(p.subject.id);
+      const qs = await loadQuestions(p.subject);
+      shuffle(qs.filter((q) => ids.includes(q.id))).slice(0, p.count).forEach((q) => add(q, p.subject));
+    }
+    for (const p of plan.newParts) {
+      const seen = getSeen(p.subject.id);
+      const qs = await loadQuestions(p.subject);
+      shuffle(qs.filter((q) => q.unit === p.unit.name && !(q.id in seen))).slice(0, p.count).forEach((q) => add(q, p.subject));
+    }
+    if (!pool.length) {
+      for (const s of getMySubjects()) {
+        const seen = getSeen(s.id);
+        (await loadQuestions(s)).filter((q) => !(q.id in seen)).forEach((q) => add(q, s));
+      }
+    }
+  } catch (e) {
+    return renderHome();
+  }
+  const remaining = Math.max(getGoal() - getDoneToday(), 1);
+  startRound("today", null, pool, Math.min(QUESTIONS_PER_ROUND, remaining));
 }
 
 // -------------------------------------------------------------
@@ -596,7 +703,8 @@ function renderQuestion() {
   // 진행 바: '얼마나 남았는지' 보이면 끝까지 풀 확률이 올라가요.
   $("progress-bar").style.width = (state.index / total) * 100 + "%";
   const label = MODE_LABEL[state.mode];
-  $("quiz-unit").textContent = (label && state.mode !== "all" ? label + " · " : "") + q.unit;
+  const subjectTag = state.mode === "today" || state.mode === "again" ? q._sname + " · " : "";
+  $("quiz-unit").textContent = (label && state.mode !== "all" ? label + " · " : "") + subjectTag + q.unit;
   $("quiz-question").textContent = q.question;
   $("quiz-feedback").hidden = true;
 
@@ -607,11 +715,11 @@ function renderQuestion() {
   report.hidden = !reportUrl;
   if (reportUrl) {
     report.href = reportUrl
-      .replace("{subject}", encodeURIComponent(state.subject.name))
+      .replace("{subject}", encodeURIComponent(q._sname))
       .replace("{id}", encodeURIComponent(q.id));
   }
   // 문제 번호 표시: 제보할 때 이 번호를 보고 적으면 돼요.
-  $("report-id").textContent = state.subject.name + " · 문제 번호 " + q.id;
+  $("report-id").textContent = q._sname + " · 문제 번호 " + q.id;
 
   const nextBtn = $("next-btn");
   nextBtn.disabled = true;
@@ -716,7 +824,7 @@ function unpickOrder(pos) {
 // 채점 결과 기록 (두 문제 종류가 함께 써요)
 // -------------------------------------------------------------
 function recordResult(q, isCorrect) {
-  const subjectId = state.subject.id;
+  const subjectId = q._sid;
 
   // 오늘 푼 문제 수 +1 (오늘의 학습 목표용)
   save("done:" + todayKey(), getDoneToday() + 1);
@@ -831,7 +939,9 @@ function renderResult() {
   const score = state.correctCount;
 
   const label = state.mode === "unit" ? state.unit : MODE_LABEL[state.mode];
-  $("result-subject").textContent = state.subject.name + " · " + label;
+  // 여러 과목이 섞인 판이면 과목 이름 대신 '오늘의 학습'만 보여줘요.
+  const mixed = state.mode === "today" || state.mode === "again";
+  $("result-subject").textContent = mixed ? label : state.subject.name + " · " + label;
   $("result-score").innerHTML = score + "<small> / " + total + "</small>";
 
   const rate = score / total;
@@ -841,14 +951,12 @@ function renderResult() {
     rate >= 0.6 ? "좋아요. 틀린 문제는 내일 복습 목록에 자동으로 올라가요." :
     "괜찮아요. 틀린 문제는 내일 복습 목록에 자동으로 올라가요.";
 
-  // 틀린 문제 목록: 무엇을 틀렸는지 한눈에 보여야 다시 풀 마음이 생겨요.
-  $("result-wrong-list").innerHTML = state.roundWrong
-    .map((q) =>
-      "<li>" + escapeHtml(isOrder(q) ? "[흐름] " + q.items.slice().sort().join(", ") : q.question) +
-      "<span>정답: " + escapeHtml(answerText(q)) + "</span></li>")
-    .join("");
-  $("result-wrong").hidden = state.roundWrong.length === 0;
-  $("result-back-btn").textContent = state.mode === "today" ? "홈으로" : "단원 보기";
+  // 틀린 문제 목록: 처음엔 3개만 보여주고, 나머지는 '모두 보기'로 펼쳐요.
+  // 길게 늘어지면 아래 버튼과 응원 칸이 묻히고, 다 보고 싶은 사람은 한 번만 누르면 되니까요.
+  state.lastWrong = state.roundWrong.slice();
+  state.wrongOpen = false;
+  drawResultWrong();
+  $("result-back-btn").textContent = mixed ? "홈으로" : "단원 보기";
 
   // 오늘 목표 진행: 한 판이 끝날 때마다 "오늘 얼마나 왔는지" 보여줘요.
   const goal = getGoal();
@@ -865,8 +973,12 @@ function renderResult() {
     retry.textContent = "이어서 " + Math.min(left, QUESTIONS_PER_ROUND) + "문제 더";
     retry.onclick = () => startQuiz("today");
   } else if (state.roundWrong.length > 0) {
+    // 방금 틀린 문제만 바로 다시. (오늘의 학습처럼 과목이 섞여 있어도 돼요)
     retry.textContent = "틀린 문제 다시 풀기";
-    retry.onclick = () => startQuiz("wrong");
+    retry.onclick = () => startQuiz("again");
+  } else if (mixed) {
+    retry.textContent = "홈에서 계속";
+    retry.onclick = renderHome;
   } else if (state.mode === "review" || state.mode === "wrong") {
     retry.textContent = "새 문제 풀기";
     retry.onclick = () => startQuiz("all");
@@ -880,6 +992,23 @@ function renderResult() {
 
   $("progress-bar").style.width = "100%";
   showScreen("result");
+}
+
+const WRONG_PREVIEW = 3;
+function drawResultWrong() {
+  const list = state.roundWrong;
+  const shown = state.wrongOpen ? list : list.slice(0, WRONG_PREVIEW);
+  const mixed = new Set(list.map((q) => q._sid)).size > 1;
+  $("result-wrong-list").innerHTML = shown
+    .map((q) =>
+      "<li>" + (mixed ? '<span class="tag">' + escapeHtml(q._sname) + "</span>" : "") +
+      escapeHtml(isOrder(q) ? "[흐름] " + q.items.slice().sort().join(", ") : q.question) +
+      "<span>정답: " + escapeHtml(answerText(q)) + "</span></li>")
+    .join("");
+  $("result-wrong").hidden = list.length === 0;
+  const more = $("result-wrong-more");
+  more.hidden = list.length <= WRONG_PREVIEW;
+  more.textContent = state.wrongOpen ? "접기" : "틀린 문제 모두 보기 (" + list.length + ")";
 }
 
 // -------------------------------------------------------------
@@ -989,10 +1118,16 @@ async function init() {
     else console.warn("화면에 없는 요소:", id);
   };
   on("next-btn", "click", next);
-  on("quit-btn", "click", () => (state.mode === "today" ? renderHome() : openSubject(state.subject)));
+  const backFromRound = () => (state.mode === "today" || state.mode === "again" ? renderHome() : openSubject(state.subject));
+  on("quit-btn", "click", backFromRound);
+  on("result-home-btn", "click", renderHome);
+  on("result-wrong-more", "click", () => {
+    state.wrongOpen = !state.wrongOpen;
+    drawResultWrong();
+  });
   on("subject-back-btn", "click", renderHome);
   // 오늘의 학습에서 온 경우엔 홈(오늘 카드)으로, 아니면 과목 화면으로 돌아가요.
-  on("result-back-btn", "click", () => (state.mode === "today" ? renderHome() : openSubject(state.subject)));
+  on("result-back-btn", "click", backFromRound);
   on("subject-all-btn", "click", () => startQuiz("all"));
   on("subject-wrong-btn", "click", () => startQuiz("wrong"));
   on("flow-card", "click", () => startQuiz("flow"));
