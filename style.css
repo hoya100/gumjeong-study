@@ -395,3 +395,6 @@ details[open] summary { margin-bottom: 4px; }
 /* 과목 화면: 용어 설명 접기 */
 .help-more { margin: 20px 0 0; }
 .help-more .help-list { margin-top: 8px; }
+
+/* 응원 버튼을 누른 뒤 고마움 + 솔직한 안내 */
+.support-thanks { margin: 0; font-size: 14px; color: var(--accent); line-height: 1.6; }
