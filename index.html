@@ -26,32 +26,37 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;700&display=swap" rel="stylesheet">
-  <!-- ?v=11 은 '버전 표시'예요. 파일을 고칠 때마다 이 숫자를 올리면
+  <!-- ?v=12 은 '버전 표시'예요. 파일을 고칠 때마다 이 숫자를 올리면
        브라우저가 주소가 바뀐 걸 보고 옛날 파일 대신 새 파일을 받아와요(캐시 무력화).
        아래 app.js의 ?v= 숫자와 항상 같이 올려주세요. -->
-  <link rel="stylesheet" href="style.css?v=11">
+  <link rel="stylesheet" href="style.css?v=12">
 </head>
 <body>
   <!-- 화면은 4개(홈 → 과목 → 퀴즈 → 결과)이고 페이지는 하나예요.
        JS가 상황에 맞는 화면 하나만 보여주고 나머지는 숨겨요. -->
 
-  <!-- ============ 1. 홈: 과목 고르기 ============ -->
+  <!-- ============ 1. 홈 ============ -->
+  <!-- 정리 원칙
+       1) 화면마다 파란 버튼은 하나: '오늘 계획대로 시작'. 눈이 어디서 시작할지 바로 알게요.
+       2) 가끔 바꾸는 설정(시험일, 하루 목표)은 작게 두고, 눌렀을 때만 펼쳐요(점진적 공개). -->
   <section id="screen-home" class="screen">
     <div class="wrap">
-      <header class="home-head">
+      <!-- 머리줄: 사이트 이름(왼쪽) + D-day(오른쪽). 따로 카드를 쓰지 않고 한 줄로 합쳤어요. -->
+      <header class="home-top">
         <p class="eyebrow" id="site-name">검정고시 연습 퀴즈</p>
-        <h1>오늘은 어떤 과목을<br>풀어볼까요?</h1>
+        <label class="dday-pill" title="눌러서 시험일 바꾸기">
+          <span id="dday">시험일 설정</span>
+          <input type="date" id="exam-date-input" aria-label="시험일 설정">
+        </label>
       </header>
 
-      <!-- 오늘의 한마디: 날짜마다 하나씩 바뀌어요. 같은 날엔 누가 와도 같은 문장이에요. -->
+      <!-- 오늘의 한마디 -->
       <div id="quote-card" class="quote-card" hidden>
-        <p class="quote-label">오늘의 한마디</p>
         <p id="quote-text" class="quote-text"></p>
         <p id="quote-author" class="quote-author"></p>
       </div>
 
-      <!-- 오늘의 학습: 목표(사용자가 정함) + 무엇을 풀지(사이트가 추천) + 내일 미리보기.
-           들어오자마자 '오늘 할 것'이 보여야 고민 없이 바로 시작해요. -->
+      <!-- 오늘의 학습: 이 화면의 주인공. 들어오자마자 '오늘 할 것'이 보여야 고민 없이 시작해요. -->
       <div id="today-card" class="card today-card" hidden>
         <div class="today-head">
           <p class="today-title">오늘의 학습</p>
@@ -60,39 +65,33 @@
         <div class="unit-bar today-bar"><div id="today-bar"></div></div>
         <ul id="today-plan" class="today-plan"></ul>
         <button id="today-start" class="primary wide"></button>
-        <p id="tomorrow-text" class="tomorrow"></p>
-        <div class="goal-row">
+        <div class="today-foot">
+          <p id="tomorrow-text" class="tomorrow"></p>
+          <button id="goal-toggle" class="text-btn" aria-expanded="false"></button>
+        </div>
+        <!-- 하루 목표 고르기: 평소엔 접혀 있다가 '목표 변경'을 누르면 펼쳐져요. -->
+        <div id="goal-row" class="goal-row" hidden>
           <span>하루 목표 문제 수</span>
           <div id="goal-chips" class="goal-chips"></div>
         </div>
       </div>
 
-      <!-- D-day 카드: 수험생이 들어오자마자 가장 먼저 보고 싶은 정보라서 맨 위에 둬요. -->
-      <div class="card dday-card">
-        <div>
-          <p class="dday-label">시험까지</p>
-          <p class="dday-value" id="dday">시험일을 설정하세요</p>
-        </div>
-        <label class="date-btn">
-          날짜 설정
-          <input type="date" id="exam-date-input" aria-label="시험일">
-        </label>
-      </div>
-
-      <h2 class="section-title">풀 수 있는 과목</h2>
+      <h2 class="section-title">과목</h2>
       <div id="ready-list" class="ready-list"></div>
+      <!-- 준비 중인 과목: 누를 수 없으니 칩 10개 대신 한 줄 글로. -->
+      <p id="soon-list" class="soon-line"></p>
 
-      <h2 class="section-title muted">준비 중</h2>
-      <div id="soon-list" class="soon-list"></div>
-
-      <!-- 신뢰 카드: 처음 온 사람이 "믿어도 되나?"에 답을 얻는 곳 -->
-      <div class="card about-card">
-        <p class="about-title">이 사이트는요</p>
-        <p id="about-text"></p>
-        <p class="about-meta" id="about-meta"></p>
-        <p class="about-meta" id="about-disclaimer"></p>
-        <p class="about-meta" id="official-link"></p>
-      </div>
+      <!-- 소개: 꼭 필요한 고지(공식 기출 아님, AI 제작)는 늘 보이게, 자세한 설명은 접어둬요. -->
+      <footer class="about">
+        <p id="about-short" class="about-short"></p>
+        <details class="about-more">
+          <summary>이 사이트에 대해 자세히</summary>
+          <p id="about-text"></p>
+          <p class="about-meta" id="about-meta"></p>
+          <p class="about-meta" id="about-disclaimer"></p>
+          <p class="about-meta" id="official-link"></p>
+        </details>
+      </footer>
     </div>
   </section>
 
@@ -140,12 +139,15 @@
       <h2 class="section-title">단원별로 풀기</h2>
       <div id="unit-list" class="unit-list"></div>
 
-      <!-- 비슷해 보이는 두 기능의 차이를 짧게 설명해요. 헷갈리면 아예 안 누르게 되거든요. -->
-      <ul class="help-list">
-        <li><strong>오답노트</strong> 틀린 문제를 모아둔 곳이에요. 다시 맞히면 빠져요.</li>
-        <li><strong>복습</strong> 틀린 문제를 1일, 3일, 7일 뒤에 다시 내줘요. 그날이 되면 위에 카드가 떠요.</li>
-        <li><strong>정답률</strong> 문제마다 가장 최근에 푼 결과로 계산해요.</li>
-      </ul>
+      <!-- 용어 설명: 궁금한 사람만 펼쳐 보게 접어둬요. -->
+      <details class="help-more">
+        <summary>오답노트·복습·정답률은 뭐가 달라요?</summary>
+        <ul class="help-list">
+          <li><strong>오답노트</strong> 틀린 문제를 모아둔 곳이에요. 다시 맞히면 빠져요.</li>
+          <li><strong>복습</strong> 틀린 문제를 1일, 3일, 7일 뒤에 다시 내줘요. 그날이 되면 위에 카드가 떠요.</li>
+          <li><strong>정답률</strong> 문제마다 가장 최근에 푼 결과로 계산해요.</li>
+        </ul>
+      </details>
     </div>
 
     <div class="bottom-bar">
@@ -233,6 +235,6 @@
     계속 그러면 Ctrl+Shift+R(맥은 Cmd+Shift+R)로 강력 새로고침해 주세요.
   </div>
 
-  <script src="app.js?v=11"></script>
+  <script src="app.js?v=12"></script>
 </body>
 </html>
