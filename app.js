@@ -57,7 +57,11 @@ const state = {
   unit: null,        // 단원 모드일 때 고른 단원 이름
 };
 
-const MODE_LABEL = { all: "전체 범위", unit: "", wrong: "오답노트", review: "오늘의 복습", flow: "흐름 문제" };
+const MODE_LABEL = { all: "전체 범위", unit: "", wrong: "오답노트", review: "오늘의 복습", flow: "흐름 문제", today: "오늘의 학습" };
+
+// 하루 목표로 고를 수 있는 문제 수. 기본은 20문제(약 10분).
+const DAILY_GOALS = [10, 20, 30, 50];
+const DEFAULT_GOAL = 20;
 
 // -------------------------------------------------------------
 // 브라우저 저장소(localStorage) 도우미
@@ -110,6 +114,22 @@ function addDays(days) {
   d.setDate(d.getDate() + days);
   return dateKey(d);
 }
+// 1970년 1월 1일부터 오늘이 며칠째인지. '오늘의 한마디'를 고를 때 써요.
+function dayNumber() {
+  const d = new Date();
+  return Math.floor(Date.UTC(d.getFullYear(), d.getMonth(), d.getDate()) / 86400000);
+}
+
+// 오늘 푼 문제 수 (과목 상관없이). 날짜가 바뀌면 새 칸에 세서 자동으로 0부터 시작해요.
+const getDoneToday = () => load("done:" + todayKey(), 0);
+const getGoal = () => load("dailyGoal", DEFAULT_GOAL);
+
+// 지정한 날짜(포함)까지 복습할 문제
+function dueIdsBy(subjectId, day) {
+  const review = getReview(subjectId);
+  return Object.keys(review).filter((id) => review[id].due <= day);
+}
+
 function dueIds(subjectId) {
   const review = getReview(subjectId);
   const today = todayKey();
@@ -237,6 +257,104 @@ function reviewCardHtml(subjectName, count) {
 }
 
 // -------------------------------------------------------------
+// 오늘의 한마디
+// 날짜 번호를 명언 개수로 나눈 나머지 번째 문장을 보여줘요.
+// 서버 없이도 같은 날엔 모두 같은 문장, 자정이 지나면 다음 문장이 나와요.
+// -------------------------------------------------------------
+function renderQuote() {
+  const quotes = state.quotes || [];
+  if (!quotes.length) return;
+  const q = quotes[dayNumber() % quotes.length];
+  $("quote-text").textContent = q.text;
+  // 지은이가 있으면 "— 공자, 『논어』" 처럼, 없으면(직접 쓴 문장) 비워둬요.
+  $("quote-author").textContent = q.author
+    ? "— " + q.author + (q.source ? ", " + q.source : "")
+    : "";
+  $("quote-card").hidden = false;
+}
+
+// -------------------------------------------------------------
+// 오늘의 학습 계획 세우기
+// 목표 문제 수(사용자가 정함) 안을 무엇으로 채울지 사이트가 추천해요.
+//   1순위: 오늘 복습할 문제 (잊어버리기 직전이라 가장 효과가 커요)
+//   2순위: 추천 단원의 새 문제 (약점 단원 → 없으면 가장 덜 푼 단원)
+// -------------------------------------------------------------
+function pickUnit(st, except) {
+  const open = st.units.filter((u) => u.seen < u.total && u.name !== except);
+  if (!open.length) return null;
+  if (st.weak && st.weak.name !== except && st.weak.seen < st.weak.total) return st.weak;
+  // 진도 비율이 가장 낮은 단원. 같으면 앞 단원(시대순)부터.
+  return open.slice().sort((a, b) => a.seen / a.total - b.seen / b.total)[0];
+}
+
+function makePlan(subject, st) {
+  const goal = getGoal();
+  const done = getDoneToday();
+  const remaining = Math.max(goal - done, 0);
+  const due = dueIds(subject.id).length;
+  const reviewPart = Math.min(due, remaining);
+  const unit = pickUnit(st);
+  const newPart = unit ? remaining - reviewPart : 0;
+  return { goal, done, remaining, due, reviewPart, newPart, unit };
+}
+
+function renderToday(subject, questions, st) {
+  const plan = makePlan(subject, st);
+  state.todayPlan = { subjectId: subject.id, unit: plan.unit ? plan.unit.name : null };
+
+  $("today-count").textContent = Math.min(plan.done, plan.goal) + " / " + plan.goal;
+  const bar = $("today-bar");
+  bar.style.width = Math.min(100, percent(plan.done, plan.goal)) + "%";
+  bar.classList.toggle("done", plan.remaining === 0);
+
+  // 오늘 할 일 목록
+  const items = [];
+  if (plan.remaining === 0) {
+    items.push('<li class="done-msg">오늘 목표 달성! 더 풀면 내일이 더 가벼워져요.</li>');
+  } else {
+    if (plan.reviewPart > 0) items.push("<li>복습 " + plan.reviewPart + "문제 · 잊어버리기 전에 다시 보기</li>");
+    if (plan.newPart > 0) {
+      const why = st.weak && plan.unit.name === st.weak.name ? " (약점 단원)" : "";
+      items.push("<li>새 문제 " + plan.newPart + "개 · " + escapeHtml(plan.unit.name) + why + "</li>");
+    }
+    if (!items.length) items.push("<li>모든 문제를 한 번씩 풀었어요! 전체 범위로 다시 다져보세요.</li>");
+  }
+  $("today-plan").innerHTML = items.join("");
+
+  const start = $("today-start");
+  start.textContent = plan.remaining === 0 ? "한 판 더 풀기" : plan.done === 0 ? "오늘 계획대로 시작" : "이어서 하기";
+  start.onclick = () => {
+    state.subject = subject;
+    startQuiz(plan.remaining === 0 ? "all" : "today");
+  };
+
+  // 내일 미리보기: 내일까지 쌓일 복습 + 오늘 단원 다음으로 추천할 단원
+  const tomorrowDue = dueIdsBy(subject.id, addDays(1)).length;
+  const nextUnit = pickUnit(st, plan.unit ? plan.unit.name : null) || plan.unit;
+  const parts = [];
+  if (tomorrowDue > 0) parts.push("복습 " + tomorrowDue + "문제");
+  if (nextUnit) parts.push(nextUnit.name);
+  $("tomorrow-text").textContent = parts.length ? "내일은 " + parts.join(" + ") + " 순서로 추천해요." : "";
+
+  // 목표 고르기 칩
+  const chips = $("goal-chips");
+  chips.innerHTML = "";
+  DAILY_GOALS.forEach((g) => {
+    const chip = document.createElement("button");
+    chip.className = "goal-chip" + (g === plan.goal ? " on" : "");
+    chip.textContent = g;
+    chip.setAttribute("aria-label", "하루 " + g + "문제");
+    chip.addEventListener("click", () => {
+      save("dailyGoal", g);
+      renderToday(subject, questions, st);
+    });
+    chips.appendChild(chip);
+  });
+
+  $("today-card").hidden = false;
+}
+
+// -------------------------------------------------------------
 // 1. 홈 화면
 // -------------------------------------------------------------
 async function renderHome() {
@@ -251,12 +369,13 @@ async function renderHome() {
     .map((s) => '<span class="soon-chip">' + escapeHtml(s.name) + "</span>")
     .join("");
 
+  renderQuote();
+
   // 풀 수 있는 과목: 카드 전체가 버튼이에요. 어디를 눌러도 과목 화면으로 가요.
   const readyList = $("ready-list");
-  const reviewList = $("home-review");
   readyList.innerHTML = "";
-  reviewList.innerHTML = "";
   let questionCount = 0;
+  let todayDrawn = false;
   for (const subject of ready) {
     let summary = "";
     try {
@@ -267,14 +386,10 @@ async function renderHome() {
         ? st.total + "문제 중 " + st.seenTotal + "문제 풀이 · 정답률 " + st.rate + "%"
         : st.total + "문제 · 단원별 · 흐름 문제 " + st.flowCount + "개";
 
-      // 오늘 복습할 게 있으면 홈 맨 위에 카드로 띄워요. 들어오자마자 할 일이 보여야 해요.
-      const due = dueIds(subject.id).length;
-      if (due > 0) {
-        const card = document.createElement("button");
-        card.className = "review-card";
-        card.innerHTML = reviewCardHtml(subject.name, due);
-        card.addEventListener("click", () => { state.subject = subject; startQuiz("review"); });
-        reviewList.appendChild(card);
+      // 오늘의 학습 카드는 첫 번째 과목 기준으로 그려요. (과목이 늘면 과목별로 나눌 수 있어요)
+      if (!todayDrawn) {
+        renderToday(subject, qs, st);
+        todayDrawn = true;
       }
     } catch (e) {
       summary = "문제를 불러오지 못했어요";
@@ -405,6 +520,19 @@ async function startQuiz(mode, unit) {
     const ids = dueIds(subject.id);
     pool = shuffle(all.filter((q) => ids.includes(q.id)));
     limit = REVIEW_PER_ROUND;
+  } else if (mode === "today") {
+    // 오늘의 학습: 복습할 문제 먼저 → 추천 단원의 새 문제 → 그래도 모자라면 다른 단원의 새 문제.
+    // 한 판은 10문제까지. 목표가 20이면 두 판으로 나눠서 풀어요(한 번에 너무 길면 지쳐요).
+    const ids = dueIds(subject.id);
+    const review = shuffle(all.filter((q) => ids.includes(q.id)));
+    const picked = new Set(review.map((q) => q.id));
+    const rec = state.todayPlan && state.todayPlan.unit;
+    const fresh = freshFirst(all.filter((q) => !picked.has(q.id) && !(q.id in seen)));
+    const recFirst = fresh.filter((q) => q.unit === rec).concat(fresh.filter((q) => q.unit !== rec));
+    pool = review.concat(recFirst);
+    const remaining = Math.max(getGoal() - getDoneToday(), 1);
+    limit = Math.min(QUESTIONS_PER_ROUND, remaining);
+    if (pool.length === 0) pool = freshFirst(all); // 다 풀었으면 전체에서
   } else {
     pool = freshFirst(all);
   }
@@ -559,6 +687,9 @@ function unpickOrder(pos) {
 function recordResult(q, isCorrect) {
   const subjectId = state.subject.id;
 
+  // 오늘 푼 문제 수 +1 (오늘의 학습 목표용)
+  save("done:" + todayKey(), getDoneToday() + 1);
+
   // 풀이 기록 (약점 지도용)
   const seen = getSeen(subjectId);
   seen[q.id] = isCorrect ? 1 : 0;
@@ -686,10 +817,23 @@ function renderResult() {
       "<span>정답: " + escapeHtml(answerText(q)) + "</span></li>")
     .join("");
   $("result-wrong").hidden = state.roundWrong.length === 0;
+  $("result-back-btn").textContent = state.mode === "today" ? "홈으로" : "단원 보기";
+
+  // 오늘 목표 진행: 한 판이 끝날 때마다 "오늘 얼마나 왔는지" 보여줘요.
+  const goal = getGoal();
+  const done = getDoneToday();
+  const left = Math.max(goal - done, 0);
+  $("result-today").textContent =
+    "오늘의 학습 " + Math.min(done, goal) + "/" + goal + (left ? " · " + left + "문제 남았어요" : " · 목표 달성!");
 
   // 가장 권하고 싶은 행동을 오른쪽 큰 파란 버튼에.
   const retry = $("retry-btn");
-  if (state.roundWrong.length > 0) {
+  if (state.mode === "today" && left > 0) {
+    // 오늘의 학습 중이면 '이어서'가 가장 자연스러운 다음 행동이에요.
+    // 틀린 문제는 내일 복습에 자동으로 올라가니 따로 챙기지 않아도 돼요.
+    retry.textContent = "이어서 " + Math.min(left, QUESTIONS_PER_ROUND) + "문제 더";
+    retry.onclick = () => startQuiz("today");
+  } else if (state.roundWrong.length > 0) {
     retry.textContent = "틀린 문제 다시 풀기";
     retry.onclick = () => startQuiz("wrong");
   } else if (state.mode === "review" || state.mode === "wrong") {
@@ -749,6 +893,13 @@ async function init() {
     const res = await fetch(withVersion("data/config.json"));
     if (!res.ok) throw new Error("config.json 없음");
     state.config = await res.json();
+    // 오늘의 한마디 목록. 못 불러와도 사이트는 동작해야 하니 실패는 조용히 넘어가요.
+    try {
+      const qr = await fetch(withVersion("data/quotes.json"));
+      state.quotes = qr.ok ? await qr.json() : [];
+    } catch (e) {
+      state.quotes = [];
+    }
   } catch (e) {
     $("ready-list").textContent = "설정을 불러오지 못했어요. 새로고침해 주세요.";
     showError();
@@ -766,9 +917,10 @@ async function init() {
     else console.warn("화면에 없는 요소:", id);
   };
   on("next-btn", "click", next);
-  on("quit-btn", "click", () => openSubject(state.subject));
+  on("quit-btn", "click", () => (state.mode === "today" ? renderHome() : openSubject(state.subject)));
   on("subject-back-btn", "click", renderHome);
-  on("result-back-btn", "click", () => openSubject(state.subject));
+  // 오늘의 학습에서 온 경우엔 홈(오늘 카드)으로, 아니면 과목 화면으로 돌아가요.
+  on("result-back-btn", "click", () => (state.mode === "today" ? renderHome() : openSubject(state.subject)));
   on("subject-all-btn", "click", () => startQuiz("all"));
   on("subject-wrong-btn", "click", () => startQuiz("wrong"));
   on("flow-card", "click", () => startQuiz("flow"));
