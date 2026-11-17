@@ -13,6 +13,7 @@ import sys
 
 sys.path.insert(0, os.path.dirname(__file__))
 from new_questions import QUESTIONS  # noqa: E402
+from new_flow import FLOW  # noqa: E402
 
 PATH = os.path.join(os.path.dirname(__file__), "..", "data", "history.json")
 
@@ -38,11 +39,27 @@ for qid, unit, question, correct, wrongs, explanation in QUESTIONS:
     })
     added += 1
 
+# 흐름 문제: items는 '정답 순서' 그대로 저장해요. 섞는 건 화면이 매번 해요.
+for qid, unit, items, explanation in FLOW:
+    if qid in existing:
+        continue
+    data.append({
+        "id": qid,
+        "type": "order",
+        "unit": unit,
+        "question": "다음 사건을 일어난 순서대로 눌러 주세요.",
+        "items": items,
+        "explanation": explanation,
+        "source": "자체 제작",
+    })
+    added += 1
+
 # 모든 문제에 '어떤 시험용인지' 표시. 나중에 한능검, 수능 문제를 같은 파일 구조로 넣을 때 구분용.
 for q in data:
     q.setdefault("exam", "검정고시")
 
-data.sort(key=lambda q: q["id"])
+# 일반 문제(h)를 먼저, 흐름 문제(f)를 뒤에 두고 번호순 정렬
+data.sort(key=lambda q: (q["id"][0] != "h", q["id"]))
 
 with open(PATH, "w", encoding="utf-8") as f:
     json.dump(data, f, ensure_ascii=False, indent=2)
