@@ -1,0 +1,1202 @@
+[
+  {
+    "id": "e001",
+    "unit": "어휘",
+    "question": "\"I am grateful for your help.\"에서 'grateful'의 의미로 알맞은 것은?",
+    "choices": [
+      "걱정하는",
+      "화난",
+      "감사하는",
+      "지루한"
+    ],
+    "answer": 2,
+    "explanation": "grateful은 '감사하는, 고마워하는'이라는 뜻이에요. be grateful for ~는 '~에 대해 감사하다'예요.",
+    "source": "자체 제작",
+    "exam": "검정고시"
+  },
+  {
+    "id": "e002",
+    "unit": "어휘",
+    "question": "'environment'의 뜻으로 알맞은 것은?",
+    "choices": [
+      "정부",
+      "경제",
+      "교육",
+      "환경"
+    ],
+    "answer": 3,
+    "explanation": "environment는 '환경'이에요. 경제는 economy, 정부는 government, 교육은 education이에요.",
+    "source": "자체 제작",
+    "exam": "검정고시"
+  },
+  {
+    "id": "e003",
+    "unit": "어휘",
+    "question": "'increase(증가하다)'와 뜻이 반대인 단어는?",
+    "choices": [
+      "improve",
+      "include",
+      "decrease",
+      "invent"
+    ],
+    "answer": 2,
+    "explanation": "decrease는 '감소하다'예요. include는 '포함하다', invent는 '발명하다', improve는 '개선하다'예요.",
+    "source": "자체 제작",
+    "exam": "검정고시"
+  },
+  {
+    "id": "e004",
+    "unit": "어휘",
+    "question": "'take care of'의 의미로 알맞은 것은?",
+    "choices": [
+      "~을 포기하다",
+      "~을 기다리다",
+      "~을 찾다",
+      "~을 돌보다"
+    ],
+    "answer": 3,
+    "explanation": "take care of는 '~을 돌보다'예요. '~을 찾다'는 look for, '포기하다'는 give up, '기다리다'는 wait for예요.",
+    "source": "자체 제작",
+    "exam": "검정고시"
+  },
+  {
+    "id": "e005",
+    "unit": "어휘",
+    "question": "다음 중 뜻이 비슷한 단어끼리 짝지은 것은?",
+    "choices": [
+      "buy – sell",
+      "begin – start",
+      "open – close",
+      "happy – sad"
+    ],
+    "answer": 1,
+    "explanation": "begin과 start는 둘 다 '시작하다'라는 뜻이에요. 나머지는 모두 뜻이 반대인 짝이에요.",
+    "source": "자체 제작",
+    "exam": "검정고시"
+  },
+  {
+    "id": "e006",
+    "unit": "어휘",
+    "question": "'volunteer'의 뜻으로 알맞은 것은?",
+    "choices": [
+      "자원봉사자",
+      "경쟁자",
+      "승객",
+      "소비자"
+    ],
+    "answer": 0,
+    "explanation": "volunteer는 '자원봉사자' 또는 '자원해서 하다'예요. 승객은 passenger, 경쟁자는 competitor, 소비자는 consumer예요.",
+    "source": "자체 제작",
+    "exam": "검정고시"
+  },
+  {
+    "id": "e007",
+    "unit": "생활 영어",
+    "question": "A: How have you been?\nB: ________\n빈칸에 들어갈 말로 알맞은 것은?",
+    "choices": [
+      "I've been fine, thanks.",
+      "I'm going to school.",
+      "It's on the table.",
+      "Yes, I have a pen."
+    ],
+    "answer": 0,
+    "explanation": "How have you been?은 '그동안 어떻게 지냈어?'라는 안부 인사예요. 그래서 '잘 지냈어, 고마워'가 자연스러워요.",
+    "source": "자체 제작",
+    "exam": "검정고시"
+  },
+  {
+    "id": "e008",
+    "unit": "생활 영어",
+    "question": "A: Can you help me carry this box?\nB: ________\n빈칸에 들어갈 말로 알맞은 것은?",
+    "choices": [
+      "Sure, no problem.",
+      "I'm sorry to hear that.",
+      "You're welcome.",
+      "It's three o'clock."
+    ],
+    "answer": 0,
+    "explanation": "도움을 요청받았으니 '물론이지, 문제없어'라고 수락하는 말이 알맞아요. You're welcome은 감사 인사에 대한 대답이에요.",
+    "source": "자체 제작",
+    "exam": "검정고시"
+  },
+  {
+    "id": "e009",
+    "unit": "생활 영어",
+    "question": "A: Thank you for the gift.\nB: ________\n빈칸에 들어갈 말로 알맞은 것은?",
+    "choices": [
+      "No, thanks.",
+      "Help yourself.",
+      "Same to you.",
+      "You're welcome."
+    ],
+    "answer": 3,
+    "explanation": "감사 인사에는 '천만에요'라는 뜻의 You're welcome으로 답해요. Help yourself는 음식을 권할 때 '마음껏 드세요'라는 뜻이에요.",
+    "source": "자체 제작",
+    "exam": "검정고시"
+  },
+  {
+    "id": "e010",
+    "unit": "생활 영어",
+    "question": "A: You won first prize!\nB: Really? I can't believe it!\nB의 심정으로 알맞은 것은?",
+    "choices": [
+      "화나고 억울하다",
+      "지루하고 따분하다",
+      "슬프고 외롭다",
+      "놀라고 기쁘다"
+    ],
+    "answer": 3,
+    "explanation": "1등을 했다는 말에 '정말? 믿을 수 없어!'라고 했으니 놀라면서도 기쁜 마음이에요.",
+    "source": "자체 제작",
+    "exam": "검정고시"
+  },
+  {
+    "id": "e011",
+    "unit": "생활 영어",
+    "question": "A: What's the matter? You look tired.\nB: I stayed up late studying for the exam.\nB가 피곤한 이유는?",
+    "choices": [
+      "늦게까지 게임을 했다.",
+      "감기에 걸렸다.",
+      "시험공부를 하느라 늦게 잤다.",
+      "운동을 너무 많이 했다."
+    ],
+    "answer": 2,
+    "explanation": "stay up late는 '늦게까지 깨어 있다'이고, studying for the exam은 '시험공부를 하면서'예요.",
+    "source": "자체 제작",
+    "exam": "검정고시"
+  },
+  {
+    "id": "e012",
+    "unit": "생활 영어",
+    "question": "A: Would you like some more cake?\nB: No, thanks. I'm full.\nB의 말에 담긴 의도로 알맞은 것은?",
+    "choices": [
+      "칭찬",
+      "거절",
+      "요청",
+      "사과"
+    ],
+    "answer": 1,
+    "explanation": "케이크를 더 먹겠냐는 제안에 '아니, 괜찮아. 배불러'라고 했으니 정중한 거절이에요.",
+    "source": "자체 제작",
+    "exam": "검정고시"
+  },
+  {
+    "id": "e013",
+    "unit": "문법",
+    "question": "She ______ to school every day.\n빈칸에 알맞은 것은?",
+    "choices": [
+      "go",
+      "gone",
+      "goes",
+      "going"
+    ],
+    "answer": 2,
+    "explanation": "주어가 3인칭 단수(She)이고 매일 하는 습관이라 현재형 동사에 -es를 붙인 goes를 써요.",
+    "source": "자체 제작",
+    "exam": "검정고시"
+  },
+  {
+    "id": "e014",
+    "unit": "문법",
+    "question": "I have lived here ______ 2020.\n빈칸에 알맞은 것은?",
+    "choices": [
+      "for",
+      "during",
+      "ago",
+      "since"
+    ],
+    "answer": 3,
+    "explanation": "현재완료(have lived)와 함께 '~부터, ~ 이래로'라는 시작 시점을 나타낼 때 since를 써요. for는 for three years처럼 기간 앞에 써요.",
+    "source": "자체 제작",
+    "exam": "검정고시"
+  },
+  {
+    "id": "e015",
+    "unit": "문법",
+    "question": "This is the book ______ I bought yesterday.\n빈칸에 알맞은 것은?",
+    "choices": [
+      "where",
+      "who",
+      "what",
+      "which"
+    ],
+    "answer": 3,
+    "explanation": "선행사 the book이 사물이고 bought의 목적어 역할을 하므로 관계대명사 which(또는 that)를 써요. who는 사람일 때 써요.",
+    "source": "자체 제작",
+    "exam": "검정고시"
+  },
+  {
+    "id": "e016",
+    "unit": "문법",
+    "question": "If it ______ tomorrow, we will stay home.\n빈칸에 알맞은 것은?",
+    "choices": [
+      "will rain",
+      "rains",
+      "raining",
+      "rained"
+    ],
+    "answer": 1,
+    "explanation": "조건을 나타내는 if절에서는 미래의 일이라도 현재 시제를 써요. 그래서 will rain이 아니라 rains가 맞아요.",
+    "source": "자체 제작",
+    "exam": "검정고시"
+  },
+  {
+    "id": "e017",
+    "unit": "문법",
+    "question": "This bag is ______ than that one.\n빈칸에 알맞은 것은?",
+    "choices": [
+      "heavier",
+      "heavy",
+      "heaviest",
+      "more heavy"
+    ],
+    "answer": 0,
+    "explanation": "than이 있으니 비교급이 필요해요. heavy처럼 '자음+y'로 끝나는 단어는 y를 i로 바꾸고 -er을 붙여 heavier가 돼요.",
+    "source": "자체 제작",
+    "exam": "검정고시"
+  },
+  {
+    "id": "e018",
+    "unit": "문법",
+    "question": "다음 중 어법상 바른 문장은?",
+    "choices": [
+      "She don't like apples.",
+      "I am interesting in music.",
+      "I am interested in music.",
+      "He can swims well."
+    ],
+    "answer": 2,
+    "explanation": "사람이 흥미를 느낄 때는 interested를 써요. She는 doesn't를 써야 하고, can 뒤에는 동사원형(swim)이 와야 해요.",
+    "source": "자체 제작",
+    "exam": "검정고시"
+  },
+  {
+    "id": "e019",
+    "unit": "독해",
+    "question": "Our school library will be closed next Monday for cleaning. It will open again on Tuesday at 9 a.m. Please return your books by this Friday.\n이 글의 목적으로 알맞은 것은?",
+    "choices": [
+      "도서관 봉사자를 모집하려고",
+      "도서관 위치를 안내하려고",
+      "새로 들어온 책을 소개하려고",
+      "도서관이 쉬는 날을 알리려고"
+    ],
+    "answer": 3,
+    "explanation": "청소 때문에 다음 주 월요일에 도서관이 문을 닫는다(closed)는 소식을 알리는 안내문이에요.",
+    "source": "자체 제작",
+    "exam": "검정고시"
+  },
+  {
+    "id": "e020",
+    "unit": "독해",
+    "question": "Our school library will be closed next Monday for cleaning. It will open again on Tuesday at 9 a.m. Please return your books by this Friday.\n이 글의 내용과 일치하는 것은?",
+    "choices": [
+      "다음 주 금요일에 문을 닫는다.",
+      "청소는 토요일에 한다.",
+      "책은 월요일까지 반납해야 한다.",
+      "화요일 오전 9시에 다시 문을 연다."
+    ],
+    "answer": 3,
+    "explanation": "It will open again on Tuesday at 9 a.m.에서 알 수 있어요. 문을 닫는 날은 월요일이고, 책은 이번 주 금요일까지 반납해야 해요.",
+    "source": "자체 제작",
+    "exam": "검정고시"
+  },
+  {
+    "id": "e021",
+    "unit": "독해",
+    "question": "Drinking enough water is important. It helps your body stay cool and keeps your skin healthy. Try to drink about eight glasses a day.\n이 글의 주제로 알맞은 것은?",
+    "choices": [
+      "여름철 운동하는 방법",
+      "건강한 음식 만드는 법",
+      "피부에 좋은 화장품 고르기",
+      "물을 충분히 마시는 것의 중요성"
+    ],
+    "answer": 3,
+    "explanation": "첫 문장 Drinking enough water is important가 주제문이고, 나머지 문장은 그 이유와 방법을 설명해요.",
+    "source": "자체 제작",
+    "exam": "검정고시"
+  },
+  {
+    "id": "e022",
+    "unit": "독해",
+    "question": "Minsu wanted to buy a new bike, so he saved his pocket money for six months. Finally, he had enough money and bought a blue bike.\n민수가 자전거를 사기 위해 한 일은?",
+    "choices": [
+      "쓰던 물건을 팔았다.",
+      "부모님께 돈을 빌렸다.",
+      "아르바이트를 했다.",
+      "6개월 동안 용돈을 모았다."
+    ],
+    "answer": 3,
+    "explanation": "saved his pocket money for six months는 '6개월 동안 용돈을 모았다'라는 뜻이에요.",
+    "source": "자체 제작",
+    "exam": "검정고시"
+  },
+  {
+    "id": "e023",
+    "unit": "독해",
+    "question": "Exercise is good for both your body and your mind. When you exercise, you feel less stressed. So, exercise makes you ______.\n빈칸에 들어갈 말로 알맞은 것은?",
+    "choices": [
+      "more tired and angry",
+      "lazy and bored",
+      "healthier and happier",
+      "busy and worried"
+    ],
+    "answer": 2,
+    "explanation": "운동은 몸과 마음 모두에 좋고 스트레스를 줄여 준다고 했으니, '더 건강하고 행복하게' 만든다는 말이 이어져야 해요.",
+    "source": "자체 제작",
+    "exam": "검정고시"
+  },
+  {
+    "id": "e024",
+    "unit": "독해",
+    "question": "[Science Fair] Date: May 10 / Place: School gym / Who: All students / Bring your own project.\n이 안내문의 내용과 일치하지 않는 것은?",
+    "choices": [
+      "모든 학생이 참가할 수 있다.",
+      "장소는 과학실이다.",
+      "자신의 작품을 가져와야 한다.",
+      "날짜는 5월 10일이다."
+    ],
+    "answer": 1,
+    "explanation": "Place: School gym이므로 장소는 학교 체육관이에요. 나머지 보기는 모두 안내문과 일치해요.",
+    "source": "자체 제작",
+    "exam": "검정고시"
+  },
+  {
+    "id": "e025",
+    "unit": "어휘",
+    "question": "'borrow'의 뜻으로 알맞은 것은?",
+    "choices": [
+      "빌려주다",
+      "사다",
+      "빌리다",
+      "갚다"
+    ],
+    "answer": 2,
+    "explanation": "borrow는 '(남에게서) 빌리다'예요. '빌려주다'는 lend라서 헷갈리지 않게 주의해요.",
+    "source": "자체 제작",
+    "exam": "검정고시"
+  },
+  {
+    "id": "e026",
+    "unit": "어휘",
+    "question": "'necessary'의 뜻으로 알맞은 것은?",
+    "choices": [
+      "위험한",
+      "가능한",
+      "유명한",
+      "필요한"
+    ],
+    "answer": 3,
+    "explanation": "necessary는 '필요한'이에요. 위험한은 dangerous, 유명한은 famous, 가능한은 possible이에요.",
+    "source": "자체 제작",
+    "exam": "검정고시"
+  },
+  {
+    "id": "e027",
+    "unit": "어휘",
+    "question": "'look forward to'의 의미로 알맞은 것은?",
+    "choices": [
+      "~을 찾다",
+      "~을 돌보다",
+      "~을 기대하다",
+      "~을 무시하다"
+    ],
+    "answer": 2,
+    "explanation": "look forward to는 '~을 (손꼽아) 기대하다'예요. '찾다'는 look for, '돌보다'는 look after예요.",
+    "source": "자체 제작",
+    "exam": "검정고시"
+  },
+  {
+    "id": "e028",
+    "unit": "어휘",
+    "question": "'cheap(값싼)'과 뜻이 반대인 단어는?",
+    "choices": [
+      "expensive",
+      "empty",
+      "easy",
+      "early"
+    ],
+    "answer": 0,
+    "explanation": "expensive는 '비싼'이에요. easy는 '쉬운', early는 '이른', empty는 '비어 있는'이에요.",
+    "source": "자체 제작",
+    "exam": "검정고시"
+  },
+  {
+    "id": "e029",
+    "unit": "어휘",
+    "question": "'traditional'의 뜻으로 알맞은 것은?",
+    "choices": [
+      "현대적인",
+      "전통적인",
+      "자연적인",
+      "국제적인"
+    ],
+    "answer": 1,
+    "explanation": "traditional은 '전통적인'이에요. 현대적인은 modern, 자연적인은 natural, 국제적인은 international이에요.",
+    "source": "자체 제작",
+    "exam": "검정고시"
+  },
+  {
+    "id": "e030",
+    "unit": "어휘",
+    "question": "'protect'의 뜻으로 알맞은 것은?",
+    "choices": [
+      "생산하다",
+      "보호하다",
+      "예측하다",
+      "약속하다"
+    ],
+    "answer": 1,
+    "explanation": "protect는 '보호하다'예요. 생산하다는 produce, 약속하다는 promise, 예측하다는 predict예요.",
+    "source": "자체 제작",
+    "exam": "검정고시"
+  },
+  {
+    "id": "e031",
+    "unit": "어휘",
+    "question": "'a person who works in a hospital and takes care of sick people'이 설명하는 단어는?",
+    "choices": [
+      "farmer",
+      "firefighter",
+      "pilot",
+      "nurse"
+    ],
+    "answer": 3,
+    "explanation": "병원에서 일하며 아픈 사람을 돌보는 사람은 nurse(간호사)예요.",
+    "source": "자체 제작",
+    "exam": "검정고시"
+  },
+  {
+    "id": "e032",
+    "unit": "생활 영어",
+    "question": "A: May I help you?\nB: ________\n빈칸에 들어갈 말로 알맞은 것은?",
+    "choices": [
+      "I'm fifteen years old.",
+      "Yes, I'm looking for a T-shirt.",
+      "See you later.",
+      "It's my pleasure."
+    ],
+    "answer": 1,
+    "explanation": "가게에서 점원이 '도와드릴까요?'라고 물었으니, '네, 티셔츠를 찾고 있어요'가 자연스러워요.",
+    "source": "자체 제작",
+    "exam": "검정고시"
+  },
+  {
+    "id": "e033",
+    "unit": "생활 영어",
+    "question": "A: What do you do in your free time?\nB: ________\n빈칸에 들어갈 말로 알맞은 것은?",
+    "choices": [
+      "I usually play the guitar.",
+      "I'm a student.",
+      "I'm from Korea.",
+      "It's five o'clock."
+    ],
+    "answer": 0,
+    "explanation": "free time(여가 시간)에 무엇을 하는지 물었으니 '보통 기타를 쳐'가 알맞아요.",
+    "source": "자체 제작",
+    "exam": "검정고시"
+  },
+  {
+    "id": "e034",
+    "unit": "생활 영어",
+    "question": "A: Excuse me. How can I get to the post office?\nB: ________\n빈칸에 들어갈 말로 알맞은 것은?",
+    "choices": [
+      "Go straight and turn left at the corner.",
+      "I don't like letters.",
+      "It's next Monday.",
+      "I'd like to send a letter."
+    ],
+    "answer": 0,
+    "explanation": "우체국에 가는 길을 물었으니 '쭉 가다가 모퉁이에서 왼쪽으로 도세요'처럼 길을 알려 줘야 해요.",
+    "source": "자체 제작",
+    "exam": "검정고시"
+  },
+  {
+    "id": "e035",
+    "unit": "생활 영어",
+    "question": "A: I have a bad cold.\nB: ________\n빈칸에 들어갈 말로 알맞은 것은?",
+    "choices": [
+      "Same to you.",
+      "Help yourself.",
+      "That's too bad. You should see a doctor.",
+      "Congratulations!"
+    ],
+    "answer": 2,
+    "explanation": "심한 감기에 걸렸다는 말에는 '안됐다. 병원에 가 봐'처럼 위로와 충고를 하는 게 자연스러워요.",
+    "source": "자체 제작",
+    "exam": "검정고시"
+  },
+  {
+    "id": "e036",
+    "unit": "생활 영어",
+    "question": "A: Why don't we go to the movies tonight?\nB: ________\n빈칸에 들어갈 말로 알맞은 것은?",
+    "choices": [
+      "It's my turn.",
+      "That sounds great.",
+      "Because I'm tired.",
+      "I'm sorry to hear that."
+    ],
+    "answer": 1,
+    "explanation": "Why don't we ~?는 이유를 묻는 말이 아니라 '~하는 게 어때?'라는 제안이에요. 그래서 '좋아'라고 받아들이는 말이 알맞아요.",
+    "source": "자체 제작",
+    "exam": "검정고시"
+  },
+  {
+    "id": "e037",
+    "unit": "생활 영어",
+    "question": "A: Do you mind if I open the window?\nB: Not at all.\nB의 말에 담긴 의도로 알맞은 것은?",
+    "choices": [
+      "거절",
+      "허락",
+      "사과",
+      "불평"
+    ],
+    "answer": 1,
+    "explanation": "Do you mind ~?는 '~해도 괜찮을까요?(꺼리시나요?)'라는 뜻이에요. Not at all(전혀 꺼리지 않아요)은 허락하는 대답이에요.",
+    "source": "자체 제작",
+    "exam": "검정고시"
+  },
+  {
+    "id": "e038",
+    "unit": "생활 영어",
+    "question": "(전화 통화) A: Can I speak to Jisu?\nB: ________\n빈칸에 들어갈 말로 알맞은 것은?",
+    "choices": [
+      "Hold on, please.",
+      "Nice to meet you.",
+      "I'm full.",
+      "You're welcome."
+    ],
+    "answer": 0,
+    "explanation": "지수와 통화하고 싶다고 했으니 '잠시만 기다려 주세요'라는 Hold on, please가 알맞아요.",
+    "source": "자체 제작",
+    "exam": "검정고시"
+  },
+  {
+    "id": "e039",
+    "unit": "문법",
+    "question": "He ______ TV when I called him.\n빈칸에 알맞은 것은?",
+    "choices": [
+      "watches",
+      "was watching",
+      "is watching",
+      "has watched"
+    ],
+    "answer": 1,
+    "explanation": "내가 전화한 과거의 그 순간에 하고 있던 일이므로 과거진행형 was watching을 써요.",
+    "source": "자체 제작",
+    "exam": "검정고시"
+  },
+  {
+    "id": "e040",
+    "unit": "문법",
+    "question": "I'm looking forward to ______ you.\n빈칸에 알맞은 것은?",
+    "choices": [
+      "seeing",
+      "saw",
+      "see",
+      "sees"
+    ],
+    "answer": 0,
+    "explanation": "look forward to의 to는 전치사라서 뒤에 동명사(-ing)가 와요. 그래서 seeing이 맞아요.",
+    "source": "자체 제작",
+    "exam": "검정고시"
+  },
+  {
+    "id": "e041",
+    "unit": "문법",
+    "question": "The window was ______ by Tom.\n빈칸에 알맞은 것은?",
+    "choices": [
+      "broken",
+      "breaking",
+      "broke",
+      "break"
+    ],
+    "answer": 0,
+    "explanation": "창문이 '깨진' 것이므로 수동태 'be동사 + 과거분사'를 써요. break의 과거분사는 broken이에요.",
+    "source": "자체 제작",
+    "exam": "검정고시"
+  },
+  {
+    "id": "e042",
+    "unit": "문법",
+    "question": "She told me ______ the door.\n빈칸에 알맞은 것은?",
+    "choices": [
+      "closed",
+      "close",
+      "closing",
+      "to close"
+    ],
+    "answer": 3,
+    "explanation": "tell은 'tell + 목적어 + to부정사' 형태로 '~에게 …하라고 말하다'라는 뜻이에요.",
+    "source": "자체 제작",
+    "exam": "검정고시"
+  },
+  {
+    "id": "e043",
+    "unit": "문법",
+    "question": "This is ______ interesting book I have ever read.\n빈칸에 알맞은 것은?",
+    "choices": [
+      "more",
+      "much",
+      "the most",
+      "very"
+    ],
+    "answer": 2,
+    "explanation": "'지금까지 읽은 책 중 가장'이라는 뜻이므로 최상급 the most를 써요. interesting처럼 긴 형용사는 most를 앞에 붙여요.",
+    "source": "자체 제작",
+    "exam": "검정고시"
+  },
+  {
+    "id": "e044",
+    "unit": "문법",
+    "question": "I don't know ______ he will come.\n빈칸에 알맞은 것은?",
+    "choices": [
+      "which",
+      "whether",
+      "what",
+      "who"
+    ],
+    "answer": 1,
+    "explanation": "'그가 올지 안 올지'라는 뜻이므로 '~인지 아닌지'를 나타내는 whether(또는 if)를 써요.",
+    "source": "자체 제작",
+    "exam": "검정고시"
+  },
+  {
+    "id": "e045",
+    "unit": "독해",
+    "question": "Dear Ms. Kim,\nI'm sorry, but I can't go to the club meeting this Friday because I have a dental appointment.\nBest, Jiho\n이 글의 목적으로 알맞은 것은?",
+    "choices": [
+      "동아리에 가입하려고",
+      "좋은 치과를 추천하려고",
+      "모임 장소를 바꾸자고 하려고",
+      "동아리 모임에 못 간다고 알리려고"
+    ],
+    "answer": 3,
+    "explanation": "치과 예약(dental appointment) 때문에 금요일 동아리 모임에 갈 수 없다고 알리는 글이에요.",
+    "source": "자체 제작",
+    "exam": "검정고시"
+  },
+  {
+    "id": "e046",
+    "unit": "독해",
+    "question": "Many people use plastic bags only once and throw them away. These bags take hundreds of years to break down. So, we should bring our own bags when we go shopping.\n글쓴이의 주장으로 알맞은 것은?",
+    "choices": [
+      "비닐봉지는 빨리 분해된다.",
+      "비닐봉지를 더 많이 만들어야 한다.",
+      "쇼핑을 아예 하지 말아야 한다.",
+      "장을 볼 때 자기 장바구니를 가져가야 한다."
+    ],
+    "answer": 3,
+    "explanation": "마지막 문장 we should bring our own bags가 글쓴이의 주장이에요. 비닐봉지는 분해되는 데 수백 년이 걸린다고 했어요.",
+    "source": "자체 제작",
+    "exam": "검정고시"
+  },
+  {
+    "id": "e047",
+    "unit": "독해",
+    "question": "Sora gets up at six every morning. She walks her dog for thirty minutes and then eats breakfast. After that, she goes to school by bus.\n이 글의 내용과 일치하는 것은?",
+    "choices": [
+      "매일 7시에 일어난다.",
+      "걸어서 학교에 간다.",
+      "아침을 먹기 전에 개를 산책시킨다.",
+      "개와 한 시간 동안 산책한다."
+    ],
+    "answer": 2,
+    "explanation": "개를 30분 산책시킨 다음(and then) 아침을 먹는다고 했어요. 6시에 일어나고, 버스로 학교에 가요.",
+    "source": "자체 제작",
+    "exam": "검정고시"
+  },
+  {
+    "id": "e048",
+    "unit": "독해",
+    "question": "Reading books has many benefits. It helps you learn new words. It also lets you experience other people's lives. In short, reading ______.\n빈칸에 들어갈 말로 알맞은 것은?",
+    "choices": [
+      "is a waste of time",
+      "makes your eyes tired",
+      "is only for children",
+      "is good for you in many ways"
+    ],
+    "answer": 3,
+    "explanation": "독서의 여러 이점을 말한 뒤 In short(요컨대)로 정리하는 문장이므로 '여러모로 이롭다'가 알맞아요.",
+    "source": "자체 제작",
+    "exam": "검정고시"
+  },
+  {
+    "id": "e049",
+    "unit": "독해",
+    "question": "My grandmother gave me an old watch. It belonged to my grandfather, and I wear it every day.\n두 번째 문장의 It이 가리키는 것은?",
+    "choices": [
+      "오래된 시계",
+      "할머니",
+      "매일",
+      "할아버지"
+    ],
+    "answer": 0,
+    "explanation": "It은 앞 문장의 an old watch를 가리켜요. '그 시계는 할아버지의 것이었다'라는 뜻이에요.",
+    "source": "자체 제작",
+    "exam": "검정고시"
+  },
+  {
+    "id": "e050",
+    "unit": "독해",
+    "question": "[Bake Sale] When: Saturday, 10 a.m. – 2 p.m. / Where: Community Center / All money will go to the local animal shelter.\n이 안내문의 내용과 일치하지 않는 것은?",
+    "choices": [
+      "오후 2시에 끝난다.",
+      "주민 센터에서 열린다.",
+      "판매 수익은 학교 도서관에 쓰인다.",
+      "토요일에 열린다."
+    ],
+    "answer": 2,
+    "explanation": "수익금은 지역 동물 보호소(animal shelter)에 간다고 했어요. 나머지는 안내문과 일치해요.",
+    "source": "자체 제작",
+    "exam": "검정고시"
+  },
+  {
+    "id": "e051",
+    "unit": "어휘",
+    "question": "'decide'의 뜻으로 알맞은 것은?",
+    "choices": [
+      "결정하다",
+      "배달하다",
+      "방어하다",
+      "설명하다"
+    ],
+    "answer": 0,
+    "explanation": "decide는 '결정하다'예요. 설명하다는 explain, 배달하다는 deliver, 방어하다는 defend예요.",
+    "source": "자체 제작",
+    "exam": "검정고시"
+  },
+  {
+    "id": "e052",
+    "unit": "어휘",
+    "question": "'difficult(어려운)'와 뜻이 반대인 단어는?",
+    "choices": [
+      "busy",
+      "easy",
+      "early",
+      "heavy"
+    ],
+    "answer": 1,
+    "explanation": "easy는 '쉬운'이에요. early는 '이른', heavy는 '무거운', busy는 '바쁜'이에요.",
+    "source": "자체 제작",
+    "exam": "검정고시"
+  },
+  {
+    "id": "e053",
+    "unit": "어휘",
+    "question": "'give up'의 의미로 알맞은 것은?",
+    "choices": [
+      "찾아보다",
+      "일어나다",
+      "포기하다",
+      "기다리다"
+    ],
+    "answer": 2,
+    "explanation": "give up은 '포기하다'예요. 일어나다는 get up, 기다리다는 wait for, 찾아보다는 look up이에요.",
+    "source": "자체 제작",
+    "exam": "검정고시"
+  },
+  {
+    "id": "e054",
+    "unit": "어휘",
+    "question": "\"Please be patient. The bus will come soon.\"에서 'patient'의 의미로 알맞은 것은?",
+    "choices": [
+      "게으른",
+      "무례한",
+      "참을성 있는",
+      "용감한"
+    ],
+    "answer": 2,
+    "explanation": "버스가 곧 온다며 기다려 달라는 상황이므로 '참을성 있는'이에요. patient는 명사로 '환자'라는 뜻도 있어요.",
+    "source": "자체 제작",
+    "exam": "검정고시"
+  },
+  {
+    "id": "e055",
+    "unit": "어휘",
+    "question": "'pollution'의 뜻으로 알맞은 것은?",
+    "choices": [
+      "해결",
+      "오염",
+      "정치",
+      "인구"
+    ],
+    "answer": 1,
+    "explanation": "pollution은 '오염'이에요. 비슷하게 생긴 population은 '인구', politics는 '정치', solution은 '해결'이에요.",
+    "source": "자체 제작",
+    "exam": "검정고시"
+  },
+  {
+    "id": "e056",
+    "unit": "어휘",
+    "question": "'arrive'의 뜻으로 알맞은 것은?",
+    "choices": [
+      "도착하다",
+      "출발하다",
+      "준비하다",
+      "도망치다"
+    ],
+    "answer": 0,
+    "explanation": "arrive는 '도착하다'예요. arrive at/in + 장소로 써요. 출발하다는 leave, 준비하다는 prepare예요.",
+    "source": "자체 제작",
+    "exam": "검정고시"
+  },
+  {
+    "id": "e057",
+    "unit": "어휘",
+    "question": "\"Each country has its own culture.\"에서 'culture'의 뜻으로 알맞은 것은?",
+    "choices": [
+      "문화",
+      "언어",
+      "농업",
+      "날씨"
+    ],
+    "answer": 0,
+    "explanation": "culture는 '문화'예요. 농업은 agriculture, 언어는 language, 날씨는 weather예요.",
+    "source": "자체 제작",
+    "exam": "검정고시"
+  },
+  {
+    "id": "e058",
+    "unit": "어휘",
+    "question": "'a place where you can borrow books'가 설명하는 단어는?",
+    "choices": [
+      "bakery",
+      "museum",
+      "bookstore",
+      "library"
+    ],
+    "answer": 3,
+    "explanation": "책을 '빌릴' 수 있는 곳은 library(도서관)예요. bookstore(서점)는 책을 사는 곳이에요.",
+    "source": "자체 제작",
+    "exam": "검정고시"
+  },
+  {
+    "id": "e059",
+    "unit": "생활 영어",
+    "question": "A: How much is this cap?\nB: ________\n빈칸에 들어갈 말로 알맞은 것은?",
+    "choices": [
+      "I'll take it.",
+      "It's 15 dollars.",
+      "It's blue.",
+      "It's very old."
+    ],
+    "answer": 1,
+    "explanation": "How much is ~?는 가격을 묻는 말이라서 가격으로 대답해요.",
+    "source": "자체 제작",
+    "exam": "검정고시"
+  },
+  {
+    "id": "e060",
+    "unit": "생활 영어",
+    "question": "A: What's the weather like today?\nB: ________\n빈칸에 들어갈 말로 알맞은 것은?",
+    "choices": [
+      "I like summer.",
+      "It's sunny and warm.",
+      "It's ten o'clock.",
+      "It's Tuesday."
+    ],
+    "answer": 1,
+    "explanation": "What's the weather like?는 날씨를 묻는 표현이에요. '화창하고 따뜻해'가 알맞아요.",
+    "source": "자체 제작",
+    "exam": "검정고시"
+  },
+  {
+    "id": "e061",
+    "unit": "생활 영어",
+    "question": "A: I'm sorry I'm late.\nB: ________\n빈칸에 들어갈 말로 알맞은 것은?",
+    "choices": [
+      "Congratulations!",
+      "Me, too.",
+      "Thanks a lot.",
+      "That's OK. Don't worry."
+    ],
+    "answer": 3,
+    "explanation": "늦어서 미안하다는 사과에는 '괜찮아, 걱정 마'처럼 받아 주는 말이 자연스러워요.",
+    "source": "자체 제작",
+    "exam": "검정고시"
+  },
+  {
+    "id": "e062",
+    "unit": "생활 영어",
+    "question": "A: Can you tell me what time it is?\nB: ________\n빈칸에 들어갈 말로 알맞은 것은?",
+    "choices": [
+      "It's half past three.",
+      "It's on Monday.",
+      "It takes ten minutes.",
+      "I'm sixteen."
+    ],
+    "answer": 0,
+    "explanation": "몇 시인지 물었으니 '3시 30분이야(half past three)'가 알맞아요.",
+    "source": "자체 제작",
+    "exam": "검정고시"
+  },
+  {
+    "id": "e063",
+    "unit": "생활 영어",
+    "question": "A: What do you want to be in the future?\nB: ________\n빈칸에 들어갈 말로 알맞은 것은?",
+    "choices": [
+      "I was a student.",
+      "I went to the zoo.",
+      "I want to eat pizza.",
+      "I want to be a vet."
+    ],
+    "answer": 3,
+    "explanation": "장래 희망을 물었으니 '수의사가 되고 싶어'가 알맞아요. vet은 veterinarian(수의사)의 줄임말이에요.",
+    "source": "자체 제작",
+    "exam": "검정고시"
+  },
+  {
+    "id": "e064",
+    "unit": "생활 영어",
+    "question": "A: How often do you exercise?\nB: ________\n빈칸에 들어갈 말로 알맞은 것은?",
+    "choices": [
+      "With my friends.",
+      "For two hours.",
+      "Three times a week.",
+      "At the gym."
+    ],
+    "answer": 2,
+    "explanation": "How often은 '얼마나 자주'를 묻는 말이라 횟수로 답해요. For two hours는 How long(얼마나 오래)에 대한 대답이에요.",
+    "source": "자체 제작",
+    "exam": "검정고시"
+  },
+  {
+    "id": "e065",
+    "unit": "생활 영어",
+    "question": "A: I passed the exam!\nB: ________\n빈칸에 들어갈 말로 알맞은 것은?",
+    "choices": [
+      "Don't mention it.",
+      "Take care.",
+      "I'm sorry to hear that.",
+      "Congratulations! I knew you could do it."
+    ],
+    "answer": 3,
+    "explanation": "시험에 합격했다는 기쁜 소식에는 축하하는 말이 알맞아요.",
+    "source": "자체 제작",
+    "exam": "검정고시"
+  },
+  {
+    "id": "e066",
+    "unit": "생활 영어",
+    "question": "A: Could you do me a favor?\nB: Sure. What is it?\nB의 대답으로 알 수 있는 것은?",
+    "choices": [
+      "화가 났다.",
+      "부탁을 거절했다.",
+      "사과하고 있다.",
+      "부탁을 들어줄 마음이 있다."
+    ],
+    "answer": 3,
+    "explanation": "Could you do me a favor?는 '부탁 하나 들어줄래?'라는 뜻이에요. Sure(물론이지)라고 하며 무엇인지 물었으니 들어줄 마음이 있어요.",
+    "source": "자체 제작",
+    "exam": "검정고시"
+  },
+  {
+    "id": "e067",
+    "unit": "문법",
+    "question": "There ______ many people in the park.\n빈칸에 알맞은 것은?",
+    "choices": [
+      "been",
+      "are",
+      "is",
+      "be"
+    ],
+    "answer": 1,
+    "explanation": "There is/are 뒤의 명사가 복수(many people)이므로 are를 써요.",
+    "source": "자체 제작",
+    "exam": "검정고시"
+  },
+  {
+    "id": "e068",
+    "unit": "문법",
+    "question": "I have ______ been to Jeju Island.\n빈칸에 알맞은 것은?",
+    "choices": [
+      "yesterday",
+      "last year",
+      "never",
+      "ago"
+    ],
+    "answer": 2,
+    "explanation": "현재완료(have been)는 ago, yesterday, last year처럼 명확한 과거 시점을 나타내는 말과 함께 쓰지 않아요. never는 '한 번도 ~한 적 없다'라는 경험을 나타내요.",
+    "source": "자체 제작",
+    "exam": "검정고시"
+  },
+  {
+    "id": "e069",
+    "unit": "문법",
+    "question": "He is the boy ______ won the race.\n빈칸에 알맞은 것은?",
+    "choices": [
+      "where",
+      "whose",
+      "which",
+      "who"
+    ],
+    "answer": 3,
+    "explanation": "선행사 the boy가 사람이고 뒤에 주어가 빠져 있으므로 주격 관계대명사 who를 써요.",
+    "source": "자체 제작",
+    "exam": "검정고시"
+  },
+  {
+    "id": "e070",
+    "unit": "문법",
+    "question": "It is important ______ breakfast every day.\n빈칸에 알맞은 것은?",
+    "choices": [
+      "eat",
+      "ate",
+      "to eat",
+      "eaten"
+    ],
+    "answer": 2,
+    "explanation": "It은 가주어이고 진짜 주어는 to부정사 to eat breakfast예요. '아침을 먹는 것은 중요하다'라는 뜻이에요.",
+    "source": "자체 제작",
+    "exam": "검정고시"
+  },
+  {
+    "id": "e071",
+    "unit": "문법",
+    "question": "I enjoy ______ to music.\n빈칸에 알맞은 것은?",
+    "choices": [
+      "to listen",
+      "listened",
+      "listen",
+      "listening"
+    ],
+    "answer": 3,
+    "explanation": "enjoy는 목적어로 동명사(-ing)만 써요. 그래서 listening이 맞아요.",
+    "source": "자체 제작",
+    "exam": "검정고시"
+  },
+  {
+    "id": "e072",
+    "unit": "문법",
+    "question": "My brother is as tall ______ my father.\n빈칸에 알맞은 것은?",
+    "choices": [
+      "than",
+      "that",
+      "as",
+      "so"
+    ],
+    "answer": 2,
+    "explanation": "'as + 형용사 + as'는 '~만큼 …한'이라는 원급 비교예요.",
+    "source": "자체 제작",
+    "exam": "검정고시"
+  },
+  {
+    "id": "e073",
+    "unit": "문법",
+    "question": "다음 중 어법상 바른 문장은? (시제와 주어-동사 일치)",
+    "choices": [
+      "She has lived in Seoul for five years.",
+      "He didn't went to school.",
+      "They was happy.",
+      "She has lived in Seoul since five years."
+    ],
+    "answer": 0,
+    "explanation": "기간 앞에는 for를 써요. didn't 뒤에는 동사원형(go)이, 주어 They에는 were가 와야 해요.",
+    "source": "자체 제작",
+    "exam": "검정고시"
+  },
+  {
+    "id": "e074",
+    "unit": "독해",
+    "question": "Hi, everyone. Our class will clean the park near the school this Saturday. Please meet at the school gate at 9 a.m. Wear comfortable clothes.\n이 글의 목적으로 알맞은 것은?",
+    "choices": [
+      "공원 청소 활동을 안내하려고",
+      "학교 축제를 홍보하려고",
+      "공원 개장 소식을 알리려고",
+      "편한 옷을 판매하려고"
+    ],
+    "answer": 0,
+    "explanation": "우리 반이 이번 토요일에 학교 근처 공원을 청소한다며 모이는 시간과 장소를 알리는 안내문이에요.",
+    "source": "자체 제작",
+    "exam": "검정고시"
+  },
+  {
+    "id": "e075",
+    "unit": "독해",
+    "question": "Hi, everyone. Our class will clean the park near the school this Saturday. Please meet at the school gate at 9 a.m. Wear comfortable clothes.\n이 글의 내용과 일치하는 것은?",
+    "choices": [
+      "교복을 입고 와야 한다.",
+      "토요일 오전 9시에 교문에서 모인다.",
+      "공원 입구에서 모인다.",
+      "일요일에 공원을 청소한다."
+    ],
+    "answer": 1,
+    "explanation": "meet at the school gate at 9 a.m.이라고 했어요. 청소는 토요일이고, 편한 옷(comfortable clothes)을 입으라고 했어요.",
+    "source": "자체 제작",
+    "exam": "검정고시"
+  },
+  {
+    "id": "e076",
+    "unit": "독해",
+    "question": "Some people think that cats are not friendly. However, many cats love to play with their owners and follow them around the house.\n이 글의 요지로 알맞은 것은?",
+    "choices": [
+      "고양이 먹이는 신중하게 골라야 한다.",
+      "고양이보다 개를 키우는 것이 낫다.",
+      "고양이도 주인에게 다정할 수 있다.",
+      "고양이는 집 안을 싫어한다."
+    ],
+    "answer": 2,
+    "explanation": "However 뒤가 글쓴이가 말하고 싶은 내용이에요. 많은 고양이가 주인과 놀고 따라다닌다고 했어요.",
+    "source": "자체 제작",
+    "exam": "검정고시"
+  },
+  {
+    "id": "e077",
+    "unit": "독해",
+    "question": "Smartphones are useful, but using them too much can be harmful. For example, it can hurt your eyes and make it hard to sleep. So, you should ______.\n빈칸에 들어갈 말로 알맞은 것은?",
+    "choices": [
+      "use your smartphone all night",
+      "limit your smartphone time",
+      "buy a new smartphone",
+      "stop sleeping"
+    ],
+    "answer": 1,
+    "explanation": "스마트폰을 너무 많이 쓰면 해롭다고 했으니, '사용 시간을 줄여야 한다'는 결론이 자연스러워요.",
+    "source": "자체 제작",
+    "exam": "검정고시"
+  },
+  {
+    "id": "e078",
+    "unit": "독해",
+    "question": "I practiced the piano for months for the contest. When they called my name as the winner, I couldn't stop smiling.\n글쓴이의 심정으로 알맞은 것은?",
+    "choices": [
+      "기쁘고 뿌듯하다",
+      "지루하다",
+      "실망스럽다",
+      "무섭다"
+    ],
+    "answer": 0,
+    "explanation": "몇 달 동안 연습해서 우승했고, 웃음을 멈출 수 없었다고 했으니 기쁘고 뿌듯한 마음이에요.",
+    "source": "자체 제작",
+    "exam": "검정고시"
+  },
+  {
+    "id": "e079",
+    "unit": "독해",
+    "question": "[Mina's Weekly Plan] Mon – swimming / Wed – piano lesson / Fri – volunteer work\n이 계획표의 내용과 일치하지 않는 것은?",
+    "choices": [
+      "수요일에 수영을 한다.",
+      "월요일에 수영을 한다.",
+      "수요일에 피아노 수업이 있다.",
+      "금요일에 봉사 활동을 한다."
+    ],
+    "answer": 0,
+    "explanation": "수영(swimming)은 월요일이고, 수요일에는 피아노 수업이 있어요.",
+    "source": "자체 제작",
+    "exam": "검정고시"
+  },
+  {
+    "id": "e080",
+    "unit": "독해",
+    "question": "Bees are very important. They carry pollen from flower to flower, so plants can make fruit.\n두 번째 문장의 They가 가리키는 것은?",
+    "choices": [
+      "벌",
+      "과일",
+      "꽃",
+      "식물"
+    ],
+    "answer": 0,
+    "explanation": "They는 앞 문장의 Bees(벌)를 가리켜요. 벌이 꽃가루를 옮겨 식물이 열매를 맺게 돼요.",
+    "source": "자체 제작",
+    "exam": "검정고시"
+  }
+]
