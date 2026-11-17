@@ -12,7 +12,10 @@ import sys
 
 import os
 
-REQUIRED = ["id", "unit", "question", "choices", "answer", "explanation", "source", "exam"]
+REQUIRED = ["id", "unit", "question", "explanation", "source", "exam"]
+# 문제 종류별로 추가로 꼭 있어야 하는 항목
+#  - 4지선다(기본): choices(보기 4개), answer(정답 번호)
+#  - 흐름(order):   items(사건 4개, 정답 순서대로)
 CONFIG = os.path.join(os.path.dirname(__file__), "..", "data", "config.json")
 
 
@@ -51,9 +54,19 @@ def check(path):
             errors.append(f"{where}: id가 중복돼요")
         seen_ids.add(q.get("id"))
 
-        if q.get("question") in seen_questions:
-            errors.append(f"{where}: 같은 질문이 이미 있어요")
-        seen_questions.add(q.get("question"))
+        # 흐름 문제는 질문 문장이 모두 같으니, 사건 목록까지 묶어서 중복을 봐요.
+        key = (q.get("question"), tuple(q.get("items", [])))
+        if key in seen_questions:
+            errors.append(f"{where}: 같은 문제가 이미 있어요")
+        seen_questions.add(key)
+
+        if q.get("type") == "order":
+            items = q.get("items", [])
+            if len(items) != 4:
+                errors.append(f"{where}: 흐름 문제 사건이 {len(items)}개예요 (4개여야 해요)")
+            if len(set(items)) != len(items):
+                errors.append(f"{where}: 똑같은 사건이 있어요")
+            continue
 
         choices = q.get("choices", [])
         if len(choices) != 4:
@@ -69,6 +82,8 @@ def check(path):
     # (사이트가 보기를 섞긴 하지만, 원본도 고르게 두는 게 좋아요.)
     spread = [0, 0, 0, 0]
     for q in questions:
+        if q.get("type") == "order":
+            continue
         if isinstance(q.get("answer"), int) and 0 <= q["answer"] < 4:
             spread[q["answer"]] += 1
 
@@ -76,7 +91,8 @@ def check(path):
     for q in questions:
         units[q.get("unit")] = units.get(q.get("unit"), 0) + 1
 
-    print(f"문제 수: {len(questions)}")
+    flow = sum(1 for q in questions if q.get("type") == "order")
+    print(f"문제 수: {len(questions)} (4지선다 {len(questions) - flow}, 흐름 {flow})")
     print("단원별:", ", ".join(f"{u} {c}" for u, c in units.items()))
     print("정답 위치(원본 기준 1~4번):", spread)
 
