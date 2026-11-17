@@ -234,7 +234,7 @@ function renderDday() {
   const el = $("dday");
   $("exam-date-input").value = date;
   if (!date) {
-    el.textContent = "시험일을 설정하세요";
+    el.textContent = "시험일 설정";
     el.classList.add("empty");
     return;
   }
@@ -353,6 +353,16 @@ function renderToday(subject, questions, st) {
   if (nextUnit) parts.push(nextUnit.name);
   $("tomorrow-text").textContent = parts.length ? "내일은 " + parts.join(" + ") + " 순서로 추천해요." : "";
 
+  // 목표 바꾸기: 평소엔 "목표 20문제 · 변경" 글자만 보이고, 누르면 칩이 펼쳐져요.
+  const toggle = $("goal-toggle");
+  toggle.textContent = "하루 목표 " + plan.goal + "문제 · " + (state.goalOpen ? "닫기" : "변경");
+  toggle.setAttribute("aria-expanded", String(Boolean(state.goalOpen)));
+  toggle.onclick = () => {
+    state.goalOpen = !state.goalOpen;
+    renderToday(subject, questions, st);
+  };
+  $("goal-row").hidden = !state.goalOpen;
+
   // 목표 고르기 칩
   const chips = $("goal-chips");
   chips.innerHTML = "";
@@ -363,6 +373,7 @@ function renderToday(subject, questions, st) {
     chip.setAttribute("aria-label", "하루 " + g + "문제");
     chip.addEventListener("click", () => {
       save("dailyGoal", g);
+      state.goalOpen = false; // 고르면 다시 접어요. 할 일은 끝났으니까요.
       renderToday(subject, questions, st);
     });
     chips.appendChild(chip);
@@ -382,9 +393,9 @@ async function renderHome() {
   renderDday();
 
   // 준비 중인 과목: 누를 수 없으니 버튼이 아니라 작은 글자 칩으로.
-  $("soon-list").innerHTML = soon
-    .map((s) => '<span class="soon-chip">' + escapeHtml(s.name) + "</span>")
-    .join("");
+  $("soon-list").textContent = soon.length
+    ? soon.map((s) => s.name).join(" · ") + " 과목은 준비 중이에요."
+    : "";
 
   renderQuote();
 
@@ -400,8 +411,8 @@ async function renderHome() {
       questionCount += qs.length;
       const st = computeStats(subject, qs);
       summary = st.seenTotal
-        ? st.total + "문제 중 " + st.seenTotal + "문제 풀이 · 정답률 " + st.rate + "%"
-        : st.total + "문제 · 단원별 · 흐름 문제 " + st.flowCount + "개";
+        ? st.seenTotal + "/" + st.total + "문제 풀이 · 정답률 " + st.rate + "%"
+        : st.total + "문제 · 흐름 문제 " + st.flowCount + "개";
 
       // 오늘의 학습 카드는 첫 번째 과목 기준으로 그려요. (과목이 늘면 과목별로 나눌 수 있어요)
       if (!todayDrawn) {
@@ -416,13 +427,14 @@ async function renderHome() {
     card.className = "subject-card";
     card.innerHTML =
       '<div class="info"><strong>' + escapeHtml(subject.name) + "</strong><small>" +
-      escapeHtml(summary) + '</small></div><span class="primary go-btn">공부하기</span>';
+      escapeHtml(summary) + '</small></div><span class="secondary go-btn">단원별로 보기</span>';
     card.addEventListener("click", () => openSubject(subject));
     readyList.appendChild(card);
   }
 
   // 신뢰 카드
   $("about-text").textContent = state.config.about || "";
+  $("about-short").textContent = state.config.aboutShort || "";
   $("about-meta").textContent = questionCount
     ? "AI 교차 검증을 통과한 연습 문제 " + questionCount + "개"
     : "";
@@ -467,12 +479,13 @@ async function openSubject(subject) {
   // 약점 안내 문장. 상황에 따라 세 가지로 말해요.
   const weakBox = $("weak-box");
   weakBox.classList.toggle("has-weak", Boolean(st.weak));
+  weakBox.hidden = st.seenTotal === 0;
   if (st.weak) {
     weakBox.innerHTML =
       "지금 가장 약한 단원은 <strong>" + escapeHtml(st.weak.name) + "</strong>이에요. " +
       "정답률 " + st.weak.rate + "%. 이 단원부터 다시 풀어보세요.";
   } else if (st.seenTotal === 0) {
-    weakBox.textContent = "단원을 골라 풀기 시작하면, 어느 단원이 약한지 여기서 알려드려요.";
+    weakBox.textContent = "";
   } else {
     weakBox.textContent =
       "단원마다 " + MIN_SEEN_FOR_WEAK + "문제 이상 풀면 약점 단원을 찾아드려요. 정답률 80% 미만인 단원이 없다면 잘하고 있는 거예요!";
