@@ -3,6 +3,8 @@
   "about": "검정고시를 준비하는 학생이 공부하며 만든 개인 사이트예요. 문제는 2015 개정 교육과정 한국사 범위에 맞춰 AI(Claude)의 도움으로 새로 만들었고, 문제를 만들지 않은 별도의 AI 검증 단계에서 정답을 가리고 다시 풀어본 뒤 통과한 것만 올려요. 그래도 틀린 곳이 있을 수 있으니, 발견하면 문제 아래 제보 링크로 알려주세요.",
   "aboutShort": "공식 기출문제가 아니라, AI의 도움으로 만들고 검증한 연습 문제예요.",
   "donateUrl": "",
+  "supportMode": "intent",
+  "eventLogUrl": "",
   "reportUrl": "https://docs.google.com/forms/d/e/1FAIpQLSeTrxBY5Vkj4ty5TnidNxlltCIlW0JMhQlnn8xBHemXiHIZ-Q/viewform?usp=pp_url&entry.1911463519={subject}&entry.419806432={id}",
   "analyticsToken": "baa08f666a8e4e53bd9ebff296918e9f",
   "officialPastExamsUrl": "",
