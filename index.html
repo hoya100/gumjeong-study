@@ -26,10 +26,10 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;700&display=swap" rel="stylesheet">
-  <!-- ?v=12 은 '버전 표시'예요. 파일을 고칠 때마다 이 숫자를 올리면
+  <!-- ?v=13 은 '버전 표시'예요. 파일을 고칠 때마다 이 숫자를 올리면
        브라우저가 주소가 바뀐 걸 보고 옛날 파일 대신 새 파일을 받아와요(캐시 무력화).
        아래 app.js의 ?v= 숫자와 항상 같이 올려주세요. -->
-  <link rel="stylesheet" href="style.css?v=12">
+  <link rel="stylesheet" href="style.css?v=13">
 </head>
 <body>
   <!-- 화면은 4개(홈 → 과목 → 퀴즈 → 결과)이고 페이지는 하나예요.
@@ -215,9 +215,18 @@
         <ul id="result-wrong-list"></ul>
       </div>
 
+      <!-- 응원(후원) 칸
+           - 실제 후원 주소(donateUrl)가 있으면: 그 주소로 가는 링크
+           - 없고 supportMode가 "intent"면: '수요 검증' 버튼. 누르면 아직 준비 중이라고 솔직하게 알리고,
+             몇 명이 '돈을 낼 마음'이 있었는지 익명으로 한 번만 세요. 결제 통로를 만들기 전에 수요부터 확인하는 거예요. -->
       <div id="donate-box" class="card donate" hidden>
         <p>도움이 됐다면 커피 한 잔으로 응원해 주세요.<br>더 많은 과목을 만드는 데 쓸게요.</p>
-        <a id="donate-link" class="secondary" target="_blank" rel="noopener">☕ 응원하기</a>
+        <a id="donate-link" class="secondary" target="_blank" rel="noopener" hidden>☕ 응원하기</a>
+        <button id="support-btn" class="secondary" hidden>☕ 응원하기</button>
+        <p id="support-thanks" class="support-thanks" hidden>
+          고마워요! 후원 기능은 아직 준비 중이라 돈은 받지 않아요.
+          눌러주신 마음은 '응원 1'로 이름 없이 세어 두었다가, 준비되면 다음에 꼭 열게요.
+        </p>
       </div>
     </div>
 
@@ -235,6 +244,6 @@
     계속 그러면 Ctrl+Shift+R(맥은 Cmd+Shift+R)로 강력 새로고침해 주세요.
   </div>
 
-  <script src="app.js?v=12"></script>
+  <script src="app.js?v=13"></script>
 </body>
 </html>
