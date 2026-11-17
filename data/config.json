@@ -2,7 +2,7 @@
   "siteName": "검정고시 기출유형 퀴즈",
   "about": "검정고시를 준비하며 직접 공부하고 만든 사이트예요. 모든 문제는 만든 사람과 다른 검증 단계에서 정답을 가리고 다시 풀어본 뒤, 통과한 것만 올려요.",
   "donateUrl": "",
-  "reportUrl": "https://docs.google.com/forms/d/e/1FAIpQLSeTrxBY5Vkj4ty5TnidNxlltCIlW0JMhQlnn8xBHemXiHIZ-Q/viewform",
+  "reportUrl": "https://docs.google.com/forms/d/e/1FAIpQLSeTrxBY5Vkj4ty5TnidNxlltCIlW0JMhQlnn8xBHemXiHIZ-Q/viewform?usp=pp_url&entry.1911463519={subject}&entry.419806432={id}",
   "analyticsToken": "baa08f666a8e4e53bd9ebff296918e9f",
   "officialPastExamsUrl": "",
   "subjects": [
