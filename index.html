@@ -5,7 +5,7 @@
   <!-- 휴대폰 화면 폭에 맞추라는 설정. 이게 없으면 폰에서 글씨가 아주 작게 보여요. -->
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>검정고시 연습 퀴즈</title>
-  <meta name="description" content="검정고시 무료 연습 퀴즈. 지금은 한국사부터: 사건 순서를 맞히는 흐름 문제, 단원별 약점 지도, 틀린 문제를 1·3·7일 뒤 다시 내주는 복습까지.">
+  <meta name="description" content="고졸 검정고시 무료 연습 퀴즈. 국어·수학·영어·한국사를 섞어 주는 오늘의 학습, 단원별 약점 지도, 틀린 문제를 1·3·7일 뒤 다시 내주는 복습까지.">
 
   <!-- 링크 미리보기(오픈 그래프): 카페·카톡에 주소를 붙였을 때 뜨는 제목, 설명, 그림이에요.
        이게 없으면 주소만 덩그러니 보여서 아무도 안 눌러요.
@@ -13,8 +13,8 @@
        우리 사이트 밖에서 이 그림을 찾아오기 때문이에요. -->
   <meta property="og:type" content="website">
   <meta property="og:site_name" content="검정고시 연습 퀴즈">
-  <meta property="og:title" content="검정고시 연습 퀴즈 · 한국사부터 시작">
-  <meta property="og:description" content="지금은 한국사: 사건 순서 맞히기 · 단원별 약점 지도 · 1·3·7일 자동 복습. 다른 과목도 차례로 추가해요. 가입 없이 바로 풀어요.">
+  <meta property="og:title" content="검정고시 연습 퀴즈 · 국어·수학·영어·한국사">
+  <meta property="og:description" content="국어·수학·영어·한국사 · 하루 목표에 맞춘 오늘의 학습 · 단원별 약점 지도 · 1·3·7일 자동 복습. 가입 없이 바로 풀어요.">
   <meta property="og:url" content="https://hoya100.github.io/gumjeong-study/">
   <meta property="og:image" content="https://hoya100.github.io/gumjeong-study/og-image.png">
   <meta property="og:image:width" content="1200">
@@ -26,10 +26,10 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;700&display=swap" rel="stylesheet">
-  <!-- ?v=14 은 '버전 표시'예요. 파일을 고칠 때마다 이 숫자를 올리면
+  <!-- ?v=15 은 '버전 표시'예요. 파일을 고칠 때마다 이 숫자를 올리면
        브라우저가 주소가 바뀐 걸 보고 옛날 파일 대신 새 파일을 받아와요(캐시 무력화).
        아래 app.js의 ?v= 숫자와 항상 같이 올려주세요. -->
-  <link rel="stylesheet" href="style.css?v=14">
+  <link rel="stylesheet" href="style.css?v=15">
 </head>
 <body>
   <!-- 화면은 4개(홈 → 과목 → 퀴즈 → 결과)이고 페이지는 하나예요.
@@ -73,6 +73,8 @@
         <div id="goal-row" class="goal-row" hidden>
           <span>하루 목표 문제 수</span>
           <div id="goal-chips" class="goal-chips"></div>
+          <span>내 시험 과목 <small>(오늘의 학습에 섞어 넣을 과목)</small></span>
+          <div id="subject-chips" class="subject-chips"></div>
         </div>
       </div>
 
@@ -204,29 +206,33 @@
 
   <!-- ============ 4. 결과 ============ -->
   <section id="screen-result" class="screen" hidden>
+    <!-- 왼쪽 위 '‹ 홈': 결과를 보고 바로 홈으로 가고 싶은 사람을 위한 길. 아래 버튼까지 내려가지 않아도 돼요. -->
+    <div class="wrap result-top">
+      <button id="result-home-btn" class="back-btn">‹ 홈</button>
+    </div>
     <div class="wrap result-body">
       <p class="eyebrow" id="result-subject"></p>
       <p id="result-score" class="score"></p>
       <p id="result-message" class="result-message"></p>
       <p id="result-today" class="result-today"></p>
 
+      <!-- 응원 칸: 점수 바로 아래 한 줄. 틀린 문제를 안 보는 사람도 볼 수 있게 위로 올렸어요.
+           - 실제 후원 주소(donateUrl)가 있으면: 그 주소로 가는 링크
+           - 없고 supportMode가 "intent"면: '수요 검증' 버튼. 누르면 아직 준비 중이라고 솔직하게 알리고,
+             몇 명이 '돈을 낼 마음'이 있었는지 익명으로 하루 한 번만 세요. -->
+      <div id="donate-box" class="donate-line" hidden>
+        <a id="donate-link" class="support-pill" target="_blank" rel="noopener" hidden>☕ 도움이 됐다면 응원하기</a>
+        <button id="support-btn" class="support-pill" hidden>☕ 도움이 됐다면 응원하기</button>
+        <p id="support-thanks" class="support-thanks" hidden>
+          고마워요! 후원 기능은 아직 준비 중이라 돈은 받지 않아요.
+          눌러주신 마음은 이름 없이 '응원 1'로만 세어 둘게요.
+        </p>
+      </div>
+
       <div id="result-wrong" class="result-wrong" hidden>
         <h2 class="section-title">이번에 틀린 문제</h2>
         <ul id="result-wrong-list"></ul>
-      </div>
-
-      <!-- 응원(후원) 칸
-           - 실제 후원 주소(donateUrl)가 있으면: 그 주소로 가는 링크
-           - 없고 supportMode가 "intent"면: '수요 검증' 버튼. 누르면 아직 준비 중이라고 솔직하게 알리고,
-             몇 명이 '돈을 낼 마음'이 있었는지 익명으로 한 번만 세요. 결제 통로를 만들기 전에 수요부터 확인하는 거예요. -->
-      <div id="donate-box" class="card donate" hidden>
-        <p>도움이 됐다면 커피 한 잔으로 응원해 주세요.<br>더 많은 과목을 만드는 데 쓸게요.</p>
-        <a id="donate-link" class="secondary" target="_blank" rel="noopener" hidden>☕ 응원하기</a>
-        <button id="support-btn" class="secondary" hidden>☕ 응원하기</button>
-        <p id="support-thanks" class="support-thanks" hidden>
-          고마워요! 후원 기능은 아직 준비 중이라 돈은 받지 않아요.
-          눌러주신 마음은 '응원 1'로 이름 없이 세어 두었다가, 준비되면 다음에 꼭 열게요.
-        </p>
+        <button id="result-wrong-more" class="text-btn more-btn" hidden></button>
       </div>
     </div>
 
@@ -244,6 +250,6 @@
     계속 그러면 Ctrl+Shift+R(맥은 Cmd+Shift+R)로 강력 새로고침해 주세요.
   </div>
 
-  <script src="app.js?v=14"></script>
+  <script src="app.js?v=15"></script>
 </body>
 </html>
