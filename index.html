@@ -26,10 +26,10 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;700&display=swap" rel="stylesheet">
-  <!-- ?v=7 은 '버전 표시'예요. 파일을 고칠 때마다 이 숫자를 올리면
+  <!-- ?v=8 은 '버전 표시'예요. 파일을 고칠 때마다 이 숫자를 올리면
        브라우저가 주소가 바뀐 걸 보고 옛날 파일 대신 새 파일을 받아와요(캐시 무력화).
        아래 app.js의 ?v= 숫자와 항상 같이 올려주세요. -->
-  <link rel="stylesheet" href="style.css?v=7">
+  <link rel="stylesheet" href="style.css?v=8">
 </head>
 <body>
   <!-- 화면은 4개(홈 → 과목 → 퀴즈 → 결과)이고 페이지는 하나예요.
@@ -43,8 +43,29 @@
         <h1>오늘은 어떤 과목을<br>풀어볼까요?</h1>
       </header>
 
-      <!-- 오늘 복습: 할 일이 있을 때만 맨 위에 나타나요. 들어오자마자 '오늘 할 것'이 보여야 매일 와요. -->
-      <div id="home-review" class="review-list"></div>
+      <!-- 오늘의 한마디: 날짜마다 하나씩 바뀌어요. 같은 날엔 누가 와도 같은 문장이에요. -->
+      <div id="quote-card" class="quote-card" hidden>
+        <p class="quote-label">오늘의 한마디</p>
+        <p id="quote-text" class="quote-text"></p>
+        <p id="quote-author" class="quote-author"></p>
+      </div>
+
+      <!-- 오늘의 학습: 목표(사용자가 정함) + 무엇을 풀지(사이트가 추천) + 내일 미리보기.
+           들어오자마자 '오늘 할 것'이 보여야 고민 없이 바로 시작해요. -->
+      <div id="today-card" class="card today-card" hidden>
+        <div class="today-head">
+          <p class="today-title">오늘의 학습</p>
+          <span id="today-count" class="today-count"></span>
+        </div>
+        <div class="unit-bar today-bar"><div id="today-bar"></div></div>
+        <ul id="today-plan" class="today-plan"></ul>
+        <button id="today-start" class="primary wide"></button>
+        <p id="tomorrow-text" class="tomorrow"></p>
+        <div class="goal-row">
+          <span>하루 목표</span>
+          <div id="goal-chips" class="goal-chips"></div>
+        </div>
+      </div>
 
       <!-- D-day 카드: 수험생이 들어오자마자 가장 먼저 보고 싶은 정보라서 맨 위에 둬요. -->
       <div class="card dday-card">
@@ -177,6 +198,7 @@
       <p class="eyebrow" id="result-subject"></p>
       <p id="result-score" class="score"></p>
       <p id="result-message" class="result-message"></p>
+      <p id="result-today" class="result-today"></p>
 
       <div id="result-wrong" class="result-wrong" hidden>
         <h2 class="section-title">이번에 틀린 문제</h2>
@@ -203,6 +225,6 @@
     계속 그러면 Ctrl+Shift+R(맥은 Cmd+Shift+R)로 강력 새로고침해 주세요.
   </div>
 
-  <script src="app.js?v=7"></script>
+  <script src="app.js?v=8"></script>
 </body>
 </html>
