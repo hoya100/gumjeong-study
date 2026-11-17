@@ -876,12 +876,53 @@ function renderResult() {
   }
 
   // 후원 안내는 결과 화면에서만: 도움을 받은 "뒤"에 부탁해야 거부감이 적어요.
-  const donateUrl = state.config.donateUrl;
-  $("donate-box").hidden = !donateUrl;
-  if (donateUrl) $("donate-link").href = donateUrl;
+  renderSupport();
 
   $("progress-bar").style.width = "100%";
   showScreen("result");
+}
+
+// -------------------------------------------------------------
+// 응원(후원) 칸
+// -------------------------------------------------------------
+function renderSupport() {
+  const donateUrl = state.config.donateUrl;
+  const intent = state.config.supportMode === "intent";
+  $("donate-box").hidden = !donateUrl && !intent;
+  $("donate-link").hidden = !donateUrl;
+  if (donateUrl) $("donate-link").href = donateUrl;
+
+  // 수요 검증 모드: 오늘 이미 눌렀다면 고맙다는 문장을 바로 보여줘요.
+  const clickedToday = load("supportClicked", "") === todayKey();
+  $("support-btn").hidden = Boolean(donateUrl) || !intent || clickedToday;
+  $("support-thanks").hidden = Boolean(donateUrl) || !clickedToday;
+}
+
+function onSupportClick() {
+  $("support-btn").hidden = true;
+  $("support-thanks").hidden = false;
+
+  // 같은 사람이 여러 번 눌러도 하루에 한 번만 세요. 그래야 '사람 수'에 가까운 숫자가 나와요.
+  if (load("supportClicked", "") === todayKey()) return;
+  save("supportClicked", todayKey());
+  logEvent("support_click");
+}
+
+// 익명 이벤트 기록: 구글폼에 '이벤트 이름' 한 칸만 보내요. 누가 눌렀는지는 보내지 않아요.
+// config의 eventLogUrl에는 구글폼 '미리 채워진 링크'를 넣고, 값 자리를 {event}로 바꿔두면 돼요.
+// mode: "no-cors"는 '응답은 안 읽어도 되니 보내기만 해줘'라는 뜻이에요.
+// 다른 사이트(구글)로 보내는 요청이라 응답을 읽으려 하면 브라우저가 막는데, 우리는 보내기만 하면 되거든요.
+function logEvent(name) {
+  const tpl = state.config.eventLogUrl;
+  if (!tpl) return;
+  try {
+    const url = new URL(tpl.replace("{event}", encodeURIComponent(name)).replace("/viewform", "/formResponse"));
+    const body = new URLSearchParams(url.searchParams);
+    body.delete("usp");
+    fetch(url.origin + url.pathname, { method: "POST", mode: "no-cors", body });
+  } catch (e) {
+    /* 기록이 실패해도 사용자 화면에는 영향이 없어야 해요 */
+  }
 }
 
 // -------------------------------------------------------------
@@ -955,6 +996,7 @@ async function init() {
   on("subject-all-btn", "click", () => startQuiz("all"));
   on("subject-wrong-btn", "click", () => startQuiz("wrong"));
   on("flow-card", "click", () => startQuiz("flow"));
+  on("support-btn", "click", onSupportClick);
 
   // 일부 컴퓨터 브라우저는 숨긴 날짜칸을 눌러도 달력이 안 열려요.
   // 그래서 직접 달력을 열어달라고 요청해요(지원하는 브라우저에서만).
