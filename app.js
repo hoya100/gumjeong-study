@@ -1,5 +1,5 @@
 // =============================================================
-// 검정고시 기출유형 퀴즈 - 동작 코드
+// 검정고시 연습 퀴즈 - 동작 코드
 // 흐름: 설정 불러오기 → 홈(과목) → 과목(단원·약점) → 퀴즈 → 결과
 // 문제 종류: 4지선다(기본), 흐름(사건 순서 배열, type: "order")
 // =============================================================
@@ -294,15 +294,32 @@ function makePlan(subject, st) {
   const due = dueIds(subject.id).length;
   const reviewPart = Math.min(due, remaining);
   const unit = pickUnit(st);
-  const newPart = unit ? remaining - reviewPart : 0;
-  return { goal, done, remaining, due, reviewPart, newPart, unit };
+
+  // 새 문제는 '그 단원에 실제로 남은 안 푼 문제 수'까지만 추천해요.
+  // 모자라면 다음 추천 단원으로 넘겨요. (예전엔 30문제짜리 단원에 '새 문제 50개'라고 나오는 버그가 있었어요.)
+  const newParts = [];
+  let need = remaining - reviewPart;
+  const used = new Set();
+  let u = unit;
+  while (need > 0 && u) {
+    const left = u.total - u.seen;
+    const take = Math.min(left, need);
+    if (take > 0) newParts.push({ unit: u, count: take });
+    need -= take;
+    used.add(u.name);
+    u = st.units
+      .filter((x) => !used.has(x.name) && x.seen < x.total)
+      .sort((a, b) => a.seen / a.total - b.seen / b.total)[0];
+  }
+  const newPart = newParts.reduce((sum, p) => sum + p.count, 0);
+  return { goal, done, remaining, due, reviewPart, newPart, newParts, unit };
 }
 
 function renderToday(subject, questions, st) {
   const plan = makePlan(subject, st);
   state.todayPlan = { subjectId: subject.id, unit: plan.unit ? plan.unit.name : null };
 
-  $("today-count").textContent = Math.min(plan.done, plan.goal) + " / " + plan.goal;
+  $("today-count").textContent = Math.min(plan.done, plan.goal) + " / " + plan.goal + "문제";
   const bar = $("today-bar");
   bar.style.width = Math.min(100, percent(plan.done, plan.goal)) + "%";
   bar.classList.toggle("done", plan.remaining === 0);
@@ -313,10 +330,10 @@ function renderToday(subject, questions, st) {
     items.push('<li class="done-msg">오늘 목표 달성! 더 풀면 내일이 더 가벼워져요.</li>');
   } else {
     if (plan.reviewPart > 0) items.push("<li>복습 " + plan.reviewPart + "문제 · 잊어버리기 전에 다시 보기</li>");
-    if (plan.newPart > 0) {
-      const why = st.weak && plan.unit.name === st.weak.name ? " (약점 단원)" : "";
-      items.push("<li>새 문제 " + plan.newPart + "개 · " + escapeHtml(plan.unit.name) + why + "</li>");
-    }
+    plan.newParts.forEach((p) => {
+      const why = st.weak && p.unit.name === st.weak.name ? " (약점 단원)" : "";
+      items.push("<li>새 문제 " + p.count + "개 · " + escapeHtml(p.unit.name) + why + "</li>");
+    });
     if (!items.length) items.push("<li>모든 문제를 한 번씩 풀었어요! 전체 범위로 다시 다져보세요.</li>");
   }
   $("today-plan").innerHTML = items.join("");
@@ -342,7 +359,7 @@ function renderToday(subject, questions, st) {
   DAILY_GOALS.forEach((g) => {
     const chip = document.createElement("button");
     chip.className = "goal-chip" + (g === plan.goal ? " on" : "");
-    chip.textContent = g;
+    chip.textContent = g + "문제";
     chip.setAttribute("aria-label", "하루 " + g + "문제");
     chip.addEventListener("click", () => {
       save("dailyGoal", g);
@@ -407,8 +424,9 @@ async function renderHome() {
   // 신뢰 카드
   $("about-text").textContent = state.config.about || "";
   $("about-meta").textContent = questionCount
-    ? "지금까지 검증을 통과한 문제 " + questionCount + "개 · 기출 유형을 참고해 새로 만든 연습 문제예요."
+    ? "AI 교차 검증을 통과한 연습 문제 " + questionCount + "개"
     : "";
+  $("about-disclaimer").textContent = state.config.disclaimer || "";
   const officialUrl = state.config.officialPastExamsUrl;
   $("official-link").innerHTML = officialUrl
     ? '실제 기출문제는 <a href="' + escapeHtml(officialUrl) + '" target="_blank" rel="noopener">공식 게시판</a>에서 볼 수 있어요.'
