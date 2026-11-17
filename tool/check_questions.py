@@ -1,3 +1,4 @@
+# © 2026 검정고시 연습 퀴즈. All rights reserved. 허락 없이 복제·재배포 금지.
 """문제 파일 형식 검사기.
 
 사용법:  python3 tools/check_questions.py data/history.json
