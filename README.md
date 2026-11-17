@@ -2,7 +2,7 @@
 
 검정고시를 준비하며 직접 공부하고 만든 무료 한국사 퀴즈 사이트예요.
 
-👉 **바로 풀기: https://hoya100.github.io/hanguksa-quiz/**
+👉 **바로 풀기: https://hoya100.github.io/gumjeong-study/**
 
 ## 무엇을 할 수 있나요
 
