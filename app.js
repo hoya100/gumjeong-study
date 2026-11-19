@@ -867,7 +867,7 @@ function showFeedback(q, isCorrect, extra) {
   const title = $("feedback-title");
   title.textContent = isCorrect ? "정답이에요" : "아쉬워요";
   title.className = "feedback-title " + (isCorrect ? "good" : "bad");
-  $("feedback-text").textContent = (extra ? extra + " " : "") + q.explanation;
+  $("feedback-text").textContent = (extra ? extra + "\n\n" : "") + q.explanation;
   $("quiz-feedback").hidden = false;
 
   const last = state.index === state.questions.length - 1;
@@ -914,7 +914,8 @@ function checkOrder() {
   $("order-hint").hidden = true;
 
   recordResult(q, isCorrect);
-  showFeedback(q, isCorrect, isCorrect ? "" : "정답 순서:");
+  // 틀렸으면 정답 순서를 먼저 한 줄로 보여 주고, 빈 줄 뒤에 '왜' 해설을 이어 붙여요.
+  showFeedback(q, isCorrect, isCorrect ? "" : "정답 순서: " + q.items.join(" → "));
 }
 
 function next() {
