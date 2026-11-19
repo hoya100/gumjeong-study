@@ -217,7 +217,7 @@ button.subject-card { width: 100%; border: 2px solid transparent; text-align: le
 .feedback-title { margin: 0 0 6px; font-weight: 700; font-size: 17px; }
 .feedback-title.good { color: var(--good); }
 .feedback-title.bad { color: var(--bad); }
-#feedback-text { margin: 0; color: var(--sub); }
+#feedback-text { margin: 0; color: var(--sub); white-space: pre-line; line-height: 1.65; }
 .report-row { margin: 12px 0 0; display: flex; flex-wrap: wrap; gap: 4px 10px; align-items: baseline; }
 .report-link { font-size: 13px; color: var(--muted); }
 .report-id { font-size: 12px; color: var(--muted); font-variant-numeric: tabular-nums; }
