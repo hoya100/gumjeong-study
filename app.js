@@ -867,7 +867,37 @@ function showFeedback(q, isCorrect, extra) {
   const title = $("feedback-title");
   title.textContent = isCorrect ? "정답이에요" : "아쉬워요";
   title.className = "feedback-title " + (isCorrect ? "good" : "bad");
-  $("feedback-text").textContent = (extra ? extra + "\n\n" : "") + q.explanation;
+  // 1) 흐름 문제를 틀렸으면 정답 순서를 번호 목록으로
+  const orderBox = $("feedback-order-box");
+  const showOrder = isOrder(q) && !isCorrect;
+  orderBox.hidden = !showOrder;
+  $("feedback-order").innerHTML = showOrder ? q.items.map((it) => "<li>" + escapeHtml(it) + "</li>").join("") : "";
+
+  // 2) 해설 본문과 마지막 '👉' 요약 줄을 나눠요.
+  //    요약 줄은 상자로 따로 보여 주고, '구별'은 항목마다 한 줄씩 끊어서 읽기 쉽게 해요.
+  const full = (extra ? extra + "\n\n" : "") + q.explanation;
+  const cut = full.lastIndexOf("\n\n👉");
+  const body = cut >= 0 ? full.slice(0, cut) : full;
+  const tipLine = cut >= 0 ? full.slice(cut + 2).replace(/^👉\s*/, "") : "";
+  $("feedback-text").textContent = body;
+  const tip = $("feedback-tip");
+  tip.hidden = !tipLine;
+  if (tipLine) {
+    const colon = tipLine.indexOf(":");
+    const label = colon > 0 && colon <= 8 ? tipLine.slice(0, colon).trim() : "핵심";
+    const rest = colon > 0 && colon <= 8 ? tipLine.slice(colon + 1).trim() : tipLine;
+    let inner;
+    if (rest.includes(" / ")) {
+      // 구별: 항목마다 한 줄씩
+      inner = "<ul>" + rest.split(" / ").map((x) => "<li>" + escapeHtml(x) + "</li>").join("") + "</ul>";
+    } else if (rest.includes(" → ")) {
+      // 흐름: 위에서 아래로 이어지는 단계
+      inner = '<p class="tip-steps">' + rest.split(" → ").map(escapeHtml).join('<span class="tip-arrow">↓</span>') + "</p>";
+    } else {
+      inner = '<p class="tip-steps">' + escapeHtml(rest) + "</p>";
+    }
+    tip.innerHTML = '<p class="feedback-label">💡 ' + escapeHtml(label) + "</p>" + inner;
+  }
   $("quiz-feedback").hidden = false;
 
   const last = state.index === state.questions.length - 1;
@@ -915,7 +945,7 @@ function checkOrder() {
 
   recordResult(q, isCorrect);
   // 틀렸으면 정답 순서를 먼저 한 줄로 보여 주고, 빈 줄 뒤에 '왜' 해설을 이어 붙여요.
-  showFeedback(q, isCorrect, isCorrect ? "" : "정답 순서: " + q.items.join(" → "));
+  showFeedback(q, isCorrect);
 }
 
 function next() {
