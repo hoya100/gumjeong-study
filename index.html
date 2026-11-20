@@ -29,10 +29,10 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;700&display=swap" rel="stylesheet">
-  <!-- ?v=18 은 '버전 표시'예요. 파일을 고칠 때마다 이 숫자를 올리면
+  <!-- ?v=19 은 '버전 표시'예요. 파일을 고칠 때마다 이 숫자를 올리면
        브라우저가 주소가 바뀐 걸 보고 옛날 파일 대신 새 파일을 받아와요(캐시 무력화).
        아래 app.js의 ?v= 숫자와 항상 같이 올려주세요. -->
-  <link rel="stylesheet" href="style.css?v=18">
+  <link rel="stylesheet" href="style.css?v=19">
 </head>
 <body>
   <!-- 화면은 4개(홈 → 과목 → 퀴즈 → 결과)이고 페이지는 하나예요.
@@ -191,7 +191,14 @@
 
       <div id="quiz-feedback" class="card feedback" hidden>
         <p id="feedback-title" class="feedback-title"></p>
+        <!-- 흐름 문제를 틀렸을 때: 정답 순서를 번호 목록으로 따로 보여줘요 -->
+        <div id="feedback-order-box" class="feedback-order-box" hidden>
+          <p class="feedback-label">정답 순서</p>
+          <ol id="feedback-order" class="feedback-order"></ol>
+        </div>
         <p id="feedback-text"></p>
+        <!-- 해설 끝의 '👉 흐름/구별' 한 줄을 눈에 띄는 요약 상자로 따로 보여줘요 -->
+        <div id="feedback-tip" class="feedback-tip" hidden></div>
         <!-- 제보 링크 + 문제 번호. 폼에 번호가 자동으로 안 채워져도, 보고 적을 수 있게 같이 보여줘요. -->
         <p class="report-row">
           <a id="report-link" class="report-link" target="_blank" rel="noopener" hidden>문제에 오류가 있나요?</a>
@@ -255,6 +262,6 @@
     계속 그러면 Ctrl+Shift+R(맥은 Cmd+Shift+R)로 강력 새로고침해 주세요.
   </div>
 
-  <script src="app.js?v=18"></script>
+  <script src="app.js?v=19"></script>
 </body>
 </html>
