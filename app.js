@@ -1076,7 +1076,7 @@ function onSupportClick() {
 // 다른 사이트(구글)로 보내는 요청이라 응답을 읽으려 하면 브라우저가 막는데, 우리는 보내기만 하면 되거든요.
 function logEvent(name) {
   const tpl = state.config.eventLogUrl;
-  if (!tpl) return;
+  if (!tpl || state.owner) return; // 주인 모드면 응원 기록도 안 남겨요
   try {
     const url = new URL(tpl.replace("{event}", encodeURIComponent(name)).replace("/viewform", "/formResponse"));
     const body = new URLSearchParams(url.searchParams);
@@ -1109,9 +1109,31 @@ document.addEventListener("keydown", (e) => {
 // 방문자 통계 (Cloudflare Web Analytics)
 // config.json에 토큰이 있을 때만 켜요. 쿠키를 쓰지 않고 개인을 추적하지 않는 방식이에요.
 // -------------------------------------------------------------
+// -------------------------------------------------------------
+// 주인 모드: 내가 들어간 건 방문자 수에서 빼기
+// 사이트 주소 뒤에 ?me=1 을 붙여 한 번 들어가면, 그 기기·브라우저는 그때부터 통계에 안 잡혀요.
+// 되돌리려면 ?me=0 으로 한 번 들어가면 돼요.
+// (주소에 붙은 ?me=1 은 바로 지워요. 실수로 그 주소를 남에게 공유하는 일을 막으려고요.)
+// -------------------------------------------------------------
+function checkOwnerMode() {
+  try {
+    const params = new URLSearchParams(location.search);
+    if (params.has("me")) {
+      save("noTrack", params.get("me") === "1");
+      params.delete("me");
+      const q = params.toString();
+      history.replaceState(null, "", location.pathname + (q ? "?" + q : "") + location.hash);
+    }
+  } catch (e) {}
+  const owner = load("noTrack", false) === true;
+  const note = $("owner-note");
+  if (note) note.hidden = !owner;
+  return owner;
+}
+
 function startAnalytics() {
   const token = state.config.analyticsToken;
-  if (!token) return;
+  if (!token || state.owner) return;
   const s = document.createElement("script");
   s.defer = true;
   s.src = "https://static.cloudflareinsights.com/beacon.min.js";
@@ -1176,6 +1198,7 @@ async function init() {
     renderDday();
   });
 
+  state.owner = checkOwnerMode();
   startAnalytics();
   renderHome();
 }
